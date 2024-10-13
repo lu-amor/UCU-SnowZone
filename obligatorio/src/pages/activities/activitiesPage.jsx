@@ -1,5 +1,5 @@
 import React, {useState} from "react";
-import activities from "./activitiesPage.module.css";
+import classes from "./activitiesPage.module.css";
 import ActivityCard from "../../components/activity/activityCard/activityCard";
 import AuthNavBar from "../../components/navBar/navBar";
 import EditActivityModal from "../../components/activity/editActivityModal/editActivity";
@@ -14,15 +14,15 @@ const activitiesPage = ({activitiesArray, addActivity, updateActivity, deleteAct
     return (
         <>
             <AuthNavBar navItem="activities" />
-            <div className={`${activities.content}`}>
-                <h1 className={`${activities.header}`}>Activities</h1>
-                <div className={`${activities.buttonContainer}`}>
+            <div className={`${classes.content}`}>
+                <h1 className={`${classes.header}`}>Activities</h1>
+                <div className={`${classes.buttonContainer}`}>
                     <button
                         id="addActivityButton"
-                        className={`button is-medium is-primary ${activities.addActivityButton}`}
+                        className={`button is-medium is-primary ${classes.addActivityButton}`}
                         onClick={() => setIsNewModalOpen(true)}>add Activity</button>
                 </div>
-                <div className={`${activities.cardsContainer}`}>
+                <div className={`${classes.cardsContainer}`}>
                     {activitiesArray.map((activity) => {
                         return (
                             <ActivityCard

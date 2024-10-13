@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import classes from './editActivity.module.css';
 import Icon from '@mdi/react';
 import { mdiDelete } from '@mdi/js'
 
 const EditActivityModal = ({ selectedActivity, costs, closeModal, updateActivity, deleteActivity }) => {
-    const [cost, setCost] = useState('');
+    const [cost, setCost] = useState(0);
 
     useEffect(() => {
         if (selectedActivity) {
@@ -51,10 +50,10 @@ const EditActivityModal = ({ selectedActivity, costs, closeModal, updateActivity
                         </div>
                         <div className={`field is-grouped is-justify-content-flex-end`}>
                             <div className="control">
-                                <button type="button" className={`button is-danger has-text-white ${classes['boton-aceptar-cancelar']}`} onClick={closeModal}>Cancelar</button>
+                                <button type="button" className={`button is-danger has-text-white`} onClick={closeModal}>Cancelar</button>
                             </div>
                             <div className="control">
-                                <button type="submit" className={`button is-success has-text-white ${classes['boton-aceptar-cancelar']}`}>Aceptar</button>
+                                <button type="submit" className={`button is-success has-text-white`}>Aceptar</button>
                             </div>
                         </div>
                     </form>

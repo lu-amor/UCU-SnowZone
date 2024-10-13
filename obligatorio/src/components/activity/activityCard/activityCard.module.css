@@ -39,17 +39,3 @@
     justify-content: center;
     align-items: center;
 }
-
-.time {
-    display: flex;
-    flex-direction: row;
-    gap: 5px;
-}
-
-.buttonTaught {
-    width: 100%;
-    display: flex;
-    justify-content: flex-end;
-    margin-top: 15px;
-    margin-right: 10px;
-}

@@ -23,21 +23,21 @@ function App() {
   ];
 
   const studentsArray = [
-    {id: 1, name: "Estudiante 1", surname: 'surname 1', birthdate: '21-05-2004', phone: '111222333', email: 'student1@mail.com'},
-    {id: 2, name: "Estudiante 2", surname: 'surname 2', birthdate: '22-05-2004', phone: '111222333', email: 'student2@mail.com'},
-    {id: 3, name: "Estudiante 3", surname: 'surname 3', birthdate: '23-05-2004', phone: '111222333', email: 'student3@mail.com'},
+    {id: 1, name: "Estudiante 1", surname: 'Surname 1', birthdate: '21-05-2004', phone: '111222333', email: 'student1@mail.com'},
+    {id: 2, name: "Estudiante 2", surname: 'Surname 2', birthdate: '22-05-2004', phone: '111222333', email: 'student2@mail.com'},
+    {id: 3, name: "Estudiante 3", surname: 'Surname 3', birthdate: '23-05-2004', phone: '111222333', email: 'student3@mail.com'},
   ];
 
   const instructorsArray = [  
-    {id: 1, name: "Instructor 1", surname: 'surname 1', birthdate: '21-05-2004', phone: '111222333', email: 'instructor1@mail.com'},
-    {id: 2, name: "Instructor 2", surname: 'surname 2', birthdate: '22-05-2004', phone: '111222333', email: 'instructor2@mail.com'},
-    {id: 3, name: "Instructor 3", surname: 'surname 3', birthdate: '23-05-2004', phone: '111222333', email: 'instructor3@mail.com'},
+    {id: 1, name: "Instructor 1", surname: 'Surname 1', birthdate: '21-05-2004', phone: '111222333', email: 'instructor1@mail.com'},
+    {id: 2, name: "Instructor 2", surname: 'Surname 2', birthdate: '22-05-2004', phone: '111222333', email: 'instructor2@mail.com'},
+    {id: 3, name: "Instructor 3", surname: 'Surname 3', birthdate: '23-05-2004', phone: '111222333', email: 'instructor3@mail.com'},
   ];
 
   const shiftsArray = [
-    {id: 1, name: "Turno 1", from: "09:00", to: "11:00"},
-    {id: 2, name: "Turno 2", from: "11:00", to: "13:00"},
-    {id: 3, name: "Turno 3", from: "15:00", to: "17:00"},
+    {id: 1, from: "09:00", to: "11:00"},
+    {id: 2, from: "11:00", to: "13:00"},
+    {id: 3, from: "15:00", to: "17:00"},
   ];
 
   return (

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
 const EditActivityModal = ({ selectedActivity, closeModal, updateActivity, deleteActivity }) => {
-/*     const [cost, setCost] = useState('');
+/*     const [cost, setCost] = useState(0);
 
     useEffect(() => {
         if (selectedActivity) {
