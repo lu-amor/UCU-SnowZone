@@ -40,6 +40,33 @@ function App() {
     {id: 3, from: "15:00", to: "17:00"},
   ];
 
+  const reportsArray = [
+    {
+      type: "Income per activity",
+      data: [
+        { activity: "Actividad 1", income: 250 },
+        { activity: "Actividad 2", income: 500 },
+        { activity: "Actividad 3", income: 1000 }
+      ]
+    },
+    {
+      type: "Students per activity",
+      data: [
+        { activity: "Actividad 1", students: 30 },
+        { activity: "Actividad 2", students: 45 },
+        { activity: "Actividad 3", students: 20 }
+      ]
+    },
+    {
+      type: "Classes per shift",
+      data: [
+        { shift: "Mañana", classes: 5 },
+        { shift: "Tarde", classes: 7 },
+        { shift: "Noche", classes: 3 }
+      ]
+    }
+  ];
+
   return (
     <Routes>
       <Route path="/*" element={<Navigate replace to="/login" />} />
@@ -51,7 +78,7 @@ function App() {
         <Route path="/students" element={<StudentsPage studentsArray={studentsArray}/>}></Route>
         <Route path="/instructors" element={<InstructorsPage instructorsArray={instructorsArray}/>}></Route>
         <Route path="/shifts" element={<ShiftsPage shiftsArray={shiftsArray}/>}></Route>
-        <Route path="/reports" element={<ReportsPage />}></Route>
+        <Route path="/reports" element={<ReportsPage reportsArray={reportsArray}/>}></Route>
     </Routes>
   )
 }

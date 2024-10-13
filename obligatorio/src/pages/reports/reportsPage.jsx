@@ -3,16 +3,70 @@ import classes from "./reportsPage.module.css";
 import AuthNavBar from "../../components/navBar/navBar";
 
 const reportsPage = ({ reportsArray }) => {
-    const [selectedTab, setSelectedTab] = useState('Ingresos por actividad');
+    const [selectedTab, setSelectedTab] = useState('Income per activity');
 
     const renderContent = () => {
+        const selectedReport = reportsArray.find(report => report.type === selectedTab);
+        if (!selectedReport) return null;
+
         switch (selectedTab) {
-            case 'Ingresos por actividad':
-                return <div>Contenido de Ingresos por actividad</div>;
-            case 'Alumnos por actividad':
-                return <div>Contenido de Alumnos por actividad</div>;
-            case 'Clases por turno':
-                return <div>Contenido de Clases por turno</div>;
+            case 'Income per activity':
+                return (
+                    <table className={`table is-fullwidth is-striped`}>
+                        <thead>
+                            <tr className={`is-info`}>
+                                <th className={`has-text-white`} style={{ fontSize: '1.5rem', paddingLeft: '2rem' }}>Activity</th>
+                                <th className={`has-text-white`} style={{ fontSize: '1.5rem', textAlign: 'right', paddingRight: '2rem' }}>Income</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {selectedReport.data.map((report, index) => (
+                                <tr key={index}>
+                                    <td style={{ fontSize: '1.2rem', paddingLeft: '2rem' }}>{report.activity}</td>
+                                    <td style={{ fontSize: '1.2rem', textAlign: 'right', paddingRight: '2rem' }}>{report.income}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                );
+            case 'Students per activity':
+                return (
+                    <table className={`table is-fullwidth is-striped`}>
+                        <thead>
+                            <tr className={`is-info`}>
+                            <th className={`has-text-white`} style={{ fontSize: '1.5rem', paddingLeft: '2rem' }}>Activity</th>
+                            <th className={`has-text-white`} style={{ fontSize: '1.5rem', textAlign: 'right', paddingRight: '2rem' }}>No. Students</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {selectedReport.data.map((report, index) => (
+                                <tr key={index}>
+                                    <td style={{ fontSize: '1.2rem', paddingLeft: '2rem' }}>{report.activity}</td>
+                                    <td style={{ fontSize: '1.2rem', textAlign: 'right', paddingRight: '2rem' }}>{report.students}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                );
+            case 'Classes per shift':
+                return (
+                    <table className={`table is-fullwidth is-striped`}>
+                        <thead>
+                            <tr className={`is-info`}>
+                            <th className={`has-text-white`} style={{ fontSize: '1.5rem', paddingLeft: '2rem' }}>Shift</th>
+                            <th className={`has-text-white`} style={{ fontSize: '1.5rem', textAlign: 'right', paddingRight: '2rem' }}>No. Classes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {selectedReport.data.map((report, index) => (
+                                <tr key={index}>
+                                    <td style={{ fontSize: '1.2rem', paddingLeft: '2rem' }}>{report.shift}</td>
+                                    <td style={{ fontSize: '1.2rem', textAlign: 'right', paddingRight: '2rem' }}>{report.classes}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                );
             default:
                 return null;
         }
@@ -25,21 +79,21 @@ const reportsPage = ({ reportsArray }) => {
                 <h1 className={`${classes.header}`}>Reports</h1>
             </div>
             <div className={`${classes.reportsContainer}`}>
-                <div className="tabs is-right is-medium is-boxed">
+                <div className="tabs is-right is-boxed">
                     <ul>
-                        <li className={selectedTab === 'Ingresos por actividad' ? 'is-active' : ''}>
-                            <a onClick={() => setSelectedTab('Ingresos por actividad')}>
-                                <span className={`${classes.tab}`}>Ingresos por actividad</span>
+                        <li className={selectedTab === 'Income per activity' ? 'is-active' : ''}>
+                            <a onClick={() => setSelectedTab('Income per activity')}>
+                                <span>Income per activity</span>
                             </a>
                         </li>
-                        <li className={selectedTab === 'Alumnos por actividad' ? 'is-active' : ''}>
-                            <a onClick={() => setSelectedTab('Alumnos por actividad')}>
-                                <span className={`${classes.tab}`}>Alumnos por actividad</span>
+                        <li className={selectedTab === 'Students per activity' ? 'is-active' : ''}>
+                            <a onClick={() => setSelectedTab('Students per activity')}>
+                                <span>Students per activity</span>
                             </a>
                         </li>
-                        <li className={selectedTab === 'Clases por turno' ? 'is-active' : ''}>
-                            <a onClick={() => setSelectedTab('Clases por turno')}>
-                                <span className={`${classes.tab}`}>Clases por turno</span>
+                        <li className={selectedTab === 'Classes per shift' ? 'is-active' : ''}>
+                            <a onClick={() => setSelectedTab('Classes per shift')}>
+                                <span>Classes per shift</span>
                             </a>
                         </li>
                     </ul>
