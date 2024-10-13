@@ -23,6 +23,15 @@
     margin-right: 20px;
 }
 
+.buttonSelected {
+    background-color: transparent;
+    color: #173363;
+    font-weight: bolder;
+    border: none;
+    font-size: 25px;
+    cursor: pointer;
+}
+
 .underlineButton:hover {
     text-decoration: underline;
 }

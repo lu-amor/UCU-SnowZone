@@ -16,6 +16,12 @@ function LoginForm() {
     navigate("/home");
   };
 
+  const handleKeyDown = (event) => {
+    if (event.key === 'Enter') {
+      handleLoginBtn();
+    }
+  };
+
   return (
     <div className={classes.modal}>
       <div className={classes.modalContent}>
@@ -46,6 +52,7 @@ function LoginForm() {
               type="password"
               placeholder="Enter your password"
               ref={passwordRef}
+              onKeyDown={handleKeyDown}
             ></input>
           </div>
           <div className={classes.buttonContainer}>
