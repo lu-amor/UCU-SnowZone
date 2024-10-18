@@ -35,7 +35,7 @@ function AuthNavBar({ navItem }) {
         <img
           src="/UCU SnowZone logo & texto.png"
           alt="Logo"
-          style={{ alignSelf: "center", height: "100px", width: "100%", cursor: "pointer" }}
+          style={{ alignSelf: "center", height: "90px", width: "100%", cursor: "pointer" }}
         />
       </div>
 
@@ -97,22 +97,22 @@ function AuthNavBar({ navItem }) {
             </button>
           </div>
         ) : (
-          <>
-            <Icon path={mdiMenu} size={1.5} className={classes.menuIcon} onClick={toggleDropdown} />
-            {showDropdown && (
-              <div className={classes.dropdownMenu}>
-                <button onClick={goClasses}>Classes</button>
-                <button onClick={goActivities}>Activities</button>
-                <button onClick={goShifts}>Shifts</button>
-                <button onClick={goInstructors}>Instructors</button>
-                <button onClick={goStudents}>Students</button>
-                <button onClick={goReports}>Reports</button>
-              </div>
-            )}
-          </>
-        )}
+        <>
+          <Icon path={mdiMenu} size={1.5} className={classes.menuIcon} onClick={toggleDropdown} />
+          {showDropdown && (
+            <div className={classes.dropdownMenu}>
+              <button onClick={goClasses}>Classes</button>
+              <button onClick={goActivities}>Activities</button>
+              <button onClick={goShifts}>Shifts</button>
+              <button onClick={goInstructors}>Instructors</button>
+              <button onClick={goStudents}>Students</button>
+              <button onClick={goReports}>Reports</button>
+            </div>
+          )}
+        </>
+      )}
 
-      <Icon path={mdiExitToApp} size={2} className={classes.exit} onClick={goLogout} />
+      <Icon path={mdiExitToApp} size={1.5} className={classes.exit} onClick={goLogout} />
     </div>
   );
 }

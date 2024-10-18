@@ -60,9 +60,9 @@ function App() {
     {
       type: "Classes per shift",
       data: [
-        { shift: "Mañana", classes: 5 },
-        { shift: "Tarde", classes: 7 },
-        { shift: "Noche", classes: 3 }
+        { shift: "09:00 - 11:00", classes: 5 },
+        { shift: "11:00 - 13:00", classes: 7 },
+        { shift: "15:00 - 17:00", classes: 3 }
       ]
     }
   ];
@@ -73,7 +73,7 @@ function App() {
       
         <Route path="/login" element={<AuthPage />}></Route>
         <Route path="/home" element={<Home />}></Route>
-        <Route path="/classes" element={<ClassesPage classesArray={classesArray} instructors={instructorsArray} shifts={shiftsArray}/>}></Route>
+        <Route path="/classes" element={<ClassesPage classesArray={classesArray} instructors={instructorsArray} shifts={shiftsArray} students={studentsArray} activities={activitiesArray}/>}></Route>
         <Route path="/activities" element={<ActivitiesPage activitiesArray={activitiesArray}/>}></Route>
         <Route path="/students" element={<StudentsPage studentsArray={studentsArray}/>}></Route>
         <Route path="/instructors" element={<InstructorsPage instructorsArray={instructorsArray}/>}></Route>

@@ -19,7 +19,7 @@ const studentsPage = ({studentsArray, addStudent, updateStudent, deleteStudent})
                 <div className={`${classes.buttonContainer}`}>
                     <button
                         id="addStudentButton"
-                        className={`button is-medium is-primary ${classes.addStudentButton}`}
+                        className={`button is-primary ${classes.addStudentButton}`}
                         onClick={() => setIsNewModalOpen(true)}>add Student</button>
                 </div>
                 <div className={`${classes.cardsContainer}`}>
@@ -48,6 +48,7 @@ const studentsPage = ({studentsArray, addStudent, updateStudent, deleteStudent})
             )}
             {isNewModalOpen && (
                 <NewStudentModal
+                    addStudent={addStudent}
                     closeModal={() => setIsNewModalOpen(false)}
                 />
             )}

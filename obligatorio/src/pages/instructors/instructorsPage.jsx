@@ -19,7 +19,7 @@ const instructorsPage = ({instructorsArray, addInstructor, updateInstructor, del
                 <div className={`${classes.buttonContainer}`}>
                     <button
                         id="addInstructorButton"
-                        className={`button is-medium is-primary ${classes.addInstructorButton}`}
+                        className={`button is-primary ${classes.addInstructorButton}`}
                         onClick={() => setIsNewModalOpen(true)}>add Instructor</button>
                 </div>
                 <div className={`${classes.cardsContainer}`}>
@@ -48,6 +48,7 @@ const instructorsPage = ({instructorsArray, addInstructor, updateInstructor, del
             )}
             {isNewModalOpen && (
                 <NewInstructorModal
+                    addInstructor={addInstructor}
                     closeModal={() => setIsNewModalOpen(false)}
                 />
             )}

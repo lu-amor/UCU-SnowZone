@@ -48,6 +48,7 @@ const shiftsPage = ({shiftsArray, addShift, updateShift, deleteShift}) => {
             )}
             {isNewModalOpen && (
                 <NewShiftModal
+                    addShift={addShift}
                     closeModal={() => setIsNewModalOpen(false)}
                 />
             )}

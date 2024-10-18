@@ -5,7 +5,7 @@ import AuthNavBar from "../../components/navBar/navBar";
 import EditClassModal from "../../components/class/editClassModal/editClass";
 import NewClassModal from "../../components/class/newClassModal/newClass";
 
-const classesPage = ({classesArray, instructors, shifts, addClass, updateClass, deleteClass}) => {
+const classesPage = ({classesArray, instructors, shifts, activities, studentsArray, addClass, updateClass, deleteClass}) => {
     const [classList, setClassList] = useState([]);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [selectedClass, setSelectedClass] = useState(null);
@@ -19,7 +19,7 @@ const classesPage = ({classesArray, instructors, shifts, addClass, updateClass, 
                 <div className={`${classes.buttonContainer}`}>
                     <button
                         id="addClassButton"
-                        className={`button is-medium is-primary ${classes.addClassButton}`}
+                        className={`button is-primary ${classes.addClassButton}`}
                         onClick={() => setIsNewModalOpen(true)}>add Class</button>
                 </div>
                 <div className={`${classes.cardsContainer}`}>
@@ -46,11 +46,17 @@ const classesPage = ({classesArray, instructors, shifts, addClass, updateClass, 
                     selectedClass={selectedClass}
                     instructors={instructors}
                     shifts={shifts}
+                    studentsArray={studentsArray}
                 />
             )}
             {isNewModalOpen && (
                 <NewClassModal
                     closeModal={() => setIsNewModalOpen(false)}
+                    addClass={addClass}
+                    instructors={instructors}
+                    shifts={shifts}
+                    studentsArray={studentsArray}
+                    activities={activities}
                 />
             )}
         </>

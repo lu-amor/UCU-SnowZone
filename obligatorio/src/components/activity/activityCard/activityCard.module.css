@@ -1,14 +1,14 @@
 .cardContainer {
-    width: 200px;
-    min-width: 200px;
-    height: 110px;
-    min-height: 110px;
+    width: 180px;
+    min-width: 180px;
+    height: 90px;
+    min-height: 90px;
     background-color: #ea5b0c;
     border-radius: 20px;
     display: flex;
     flex-direction: column;
     cursor: pointer;
-    padding: 1.2rem;
+    padding: 0.9rem;
 }
 
 .cardContent {
@@ -21,14 +21,14 @@
 .title {
     text-align: center;
     color: #ffffff;
-    font-size: 1.5rem;
+    font-size: 1.3rem;
     font-weight: bolder;
     margin-bottom: 0.4rem;
 }
 
 .data {
     color: #ffffff;
-    font-size: 1.15rem;
+    font-size: 1rem;
     justify-content: center;
     align-items: center;
 }

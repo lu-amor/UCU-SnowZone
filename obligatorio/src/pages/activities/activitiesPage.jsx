@@ -19,7 +19,7 @@ const activitiesPage = ({activitiesArray, addActivity, updateActivity, deleteAct
                 <div className={`${classes.buttonContainer}`}>
                     <button
                         id="addActivityButton"
-                        className={`button is-medium is-primary ${classes.addActivityButton}`}
+                        className={`button is-primary ${classes.addActivityButton}`}
                         onClick={() => setIsNewModalOpen(true)}>add Activity</button>
                 </div>
                 <div className={`${classes.cardsContainer}`}>
@@ -48,6 +48,7 @@ const activitiesPage = ({activitiesArray, addActivity, updateActivity, deleteAct
             )}
             {isNewModalOpen && (
                 <NewActivityModal
+                    addActivity={addActivity}
                     closeModal={() => setIsNewModalOpen(false)}
                 />
             )}
