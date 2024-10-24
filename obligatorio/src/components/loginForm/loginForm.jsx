@@ -2,10 +2,15 @@ import React, { useRef, useState } from "react";
 import classes from "./loginForm.module.css";
 import { useNavigate } from "react-router-dom";
 
-function LoginForm() {
+function LoginForm({ createAccount }) {
   const emailRef = useRef("");
   const passwordRef = useRef("");
   const navigate = useNavigate();
+
+  const handleCreateAccountBtn = () => {
+    // logica para crear cuenta here
+    createAccount();
+  };
 
   const handleLoginBtn = () => {
     const newEmail = emailRef.current.value;
@@ -13,7 +18,15 @@ function LoginForm() {
 
     // aca se hace algo más
 
-    navigate("/home");
+    if (rol == "admin") {
+      navigate("/home");
+    } else if (rol == "instructor") {
+      navigate("/instructorHome");
+    } else if (rol == "student") {
+      navigate("/studentHome");
+    } else {
+      alert("Invalid email or password");
+    }
   };
 
   const handleKeyDown = (event) => {
@@ -62,6 +75,14 @@ function LoginForm() {
               onClick={handleLoginBtn}
             >
               Login
+            </button>
+          </div>
+          <div className={classes.buttonContainer}>
+            <button
+              style={{ font: "12px arial", marginBottom: "10px" }}
+              onClick={createAccount}
+            >
+              Create account <strong>here</strong>
             </button>
           </div>
         </div>

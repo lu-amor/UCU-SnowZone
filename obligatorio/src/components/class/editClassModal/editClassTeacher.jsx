@@ -2,18 +2,14 @@ import React, { useState, useEffect } from 'react';
 import Icon from '@mdi/react';
 import { mdiDelete } from '@mdi/js'
 
-const EditClassModal = ({ selectedClass, instructors, shifts, studentsArray, closeModal, updateClass, deleteClass }) => {
-    const [instructor, setInstructor] = useState('');
-    const [shift, setShift] = useState('');
+const EditClassTeacherModal = ({ selectedClass, instructors, shifts, studentsArray, closeModal, updateClass }) => {
     const [students, setStudents] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [filteredStudents, setFilteredStudents] = useState([]);
     const [activeTab, setActiveTab] = useState('todos');
-
+-
     useEffect(() => {
         if (selectedClass) {
-            setInstructor(selectedClass.instructor);
-            setShift(selectedClass.shift);
             setStudents(selectedClass.students);
         }
     }, [selectedClass]);
@@ -34,7 +30,7 @@ const EditClassModal = ({ selectedClass, instructors, shifts, studentsArray, clo
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const updatedClass = { ...selectedClass, instructor, shift, students };
+        const updatedClass = { ...selectedClass, students };
         await updateClass(updatedClass);
         closeModal();
     };
@@ -58,36 +54,8 @@ const EditClassModal = ({ selectedClass, instructors, shifts, studentsArray, clo
                     <p className="subtitle is-4 has-text-weight-bold">
                         Edit class - {selectedClass.activity} - {selectedClass.grupal ? 'Group' : 'Individual'}
                     </p>
+                    <div className='has-text-weight-bold mb-3'>{selectedClass.instructor} || {selectedClass.from} - {selectedClass.to}</div>
                     <form onSubmit={handleSubmit}>
-                        <div className="field is-grouped">
-                            <div className="field">
-                                <label className="label">Instructor</label>
-                                <div className="control">
-                                    <div className="select">
-                                        <select value={instructor} onChange={(e) => setInstructor(e.target.value)}>
-                                            <option value="" disabled>Select an instructor</option>
-                                            {instructors.map((instructor) => (
-                                                <option key={instructor.id} value={instructor.id}>{instructor.name}</option>
-                                            ))}
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="field">
-                                <label className="label">Shift</label>
-                                <div className="control">
-                                    <div className="select">
-                                        <select value={shift} onChange={(e) => setShift(e.target.value)}>
-                                            <option value="" disabled>Select a shift</option>
-                                            {shifts.map((shift) => (
-                                                <option key={shift.id} value={shift.id}>{shift.from} - {shift.to}</option>
-                                            ))}
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
                         <div className="field">
                             <label className="label">Search students</label>
                             <div className="control">
@@ -164,4 +132,4 @@ const EditClassModal = ({ selectedClass, instructors, shifts, studentsArray, clo
     );
 };
 
-export default EditClassModal;
+export default EditClassTeacherModal;

@@ -1,11 +1,17 @@
 import './App.css'
 import Home from './pages/home/home'
+import HomeTeacher from './pages/home/homeTeacher'
+import HomeStudent from './pages/home/homeStudent'
 import AuthPage from './pages/auth/auth'
 import ClassesPage from './pages/classes/classesPage'
+import ClassesPageTeacher from './pages/classes/classesPageTeacher'
+import ClassesPageStudents from './pages/classes/classesPageStudent'
 import ActivitiesPage from './pages/activities/activitiesPage'
+import ActivitiesPageTS from './pages/activities/activitiesPageTS'
 import StudentsPage from './pages/students/studentsPage'
 import InstructorsPage from './pages/instructors/instructorsPage'
 import ShiftsPage from './pages/shifts/shiftsPage'
+import ShiftsPageTS from './pages/shifts/shiftsPageTS'
 import ReportsPage from './pages/reports/reportsPage'
 import { Routes, Route, Navigate } from 'react-router-dom'
 
@@ -73,12 +79,19 @@ function App() {
       
         <Route path="/login" element={<AuthPage />}></Route>
         <Route path="/home" element={<Home />}></Route>
+        <Route path="/homeTeacher" element={<HomeTeacher />}></Route>
+        <Route path="/homeStudent" element={<HomeStudent />}></Route>
         <Route path="/classes" element={<ClassesPage classesArray={classesArray} instructors={instructorsArray} shifts={shiftsArray} students={studentsArray} activities={activitiesArray}/>}></Route>
+        <Route path="/classesT" element={<ClassesPageTeacher classesArray={classesArray} instructors={instructorsArray} shifts={shiftsArray} students={studentsArray}/>}></Route>
+        <Route path="/classesS" element={<ClassesPageStudents classesArray={classesArray}/>}></Route>
         <Route path="/activities" element={<ActivitiesPage activitiesArray={activitiesArray}/>}></Route>
+        <Route path="/activitiesTS" element={<ActivitiesPageTS activitiesArray={activitiesArray}/>}></Route>
         <Route path="/students" element={<StudentsPage studentsArray={studentsArray}/>}></Route>
         <Route path="/instructors" element={<InstructorsPage instructorsArray={instructorsArray}/>}></Route>
         <Route path="/shifts" element={<ShiftsPage shiftsArray={shiftsArray}/>}></Route>
+        <Route path="/shiftsTS" element={<ShiftsPageTS shiftsArray={shiftsArray}/>}></Route>
         <Route path="/reports" element={<ReportsPage reportsArray={reportsArray}/>}></Route>
+
     </Routes>
   )
 }
