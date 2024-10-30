@@ -1,13 +1,13 @@
 import React from "react";
 import classes from "./activitiesPage.module.css";
 import ActivityCardTS from "../../components/activity/activityCard/activityCardTS";
-import AuthNavBar from "../../components/navBar/navBar";
+import AuthNavBarT from "../../components/navBar/navBarT";
 
-const activitiesPage = ({activitiesArray}) => {
+const ActivitiesPageT = ({activitiesArray}) => {
 
     return (
         <>
-            <AuthNavBar navItem="activities" />
+            <AuthNavBarT navItem="activities" />
             <div className={`${classes.content}`}>
                 <h1 className={`${classes.header} mb-4`}>Activities</h1>
                 <div className={`${classes.cardsContainer}`}>
@@ -25,4 +25,4 @@ const activitiesPage = ({activitiesArray}) => {
     );
 };
 
-export default activitiesPage;
+export default ActivitiesPageT;

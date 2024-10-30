@@ -1,7 +1,7 @@
 import React, {useState} from "react";
 import classes from "./classesPage.module.css";
 import ClassCard from "../../components/class/classCard/classCard";
-import AuthNavBar from "../../components/navBar/navBar";
+import AuthNavBarT from "../../components/navBar/navBarT";
 import EditClassTeacherModal from "../../components/class/editClassModal/editClassTeacher";
 
 const classesPageTeacher = ({classesArray, instructors, shifts, studentsArray, updateClass}) => {
@@ -11,7 +11,7 @@ const classesPageTeacher = ({classesArray, instructors, shifts, studentsArray, u
 
     return (
         <>
-            <AuthNavBar navItem="classes" />
+            <AuthNavBarT navItem="classes" />
             <div className={`${classes.content}`}>
                 <h1 className={`${classes.header} mb-5`}>Classes</h1>
                 <div className={`${classes.cardsContainer}`}>

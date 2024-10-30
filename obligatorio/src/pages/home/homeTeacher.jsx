@@ -1,11 +1,11 @@
 import React from "react";
-import NavBarTS from "../../components/navBar/navBarTS";
+import NavBarT from "../../components/navBar/navBarT";
 import classes from "./home.module.css";
 
 const HomeTeacher = () => {
     return (
         <div>
-            <NavBarTS />
+            <NavBarT />
             <div className={classes.content}>
                 <h1 className={`${classes.title}`}>Home</h1>
                 <p className={`${classes.paragraph}`} style={{fontWeight: "bold"}}>

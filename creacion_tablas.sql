@@ -1,7 +1,7 @@
 CREATE TABLE obligatorio.login (
-    mail VARCHAR(255),
-    password VARCHAR(30),
-    rol ENUM('alumno', 'instructor', 'admin'),
+    mail VARCHAR(255) NOT NULL UNIQUE,
+    password VARCHAR(30) NOT NULL,
+    rol ENUM('alumno', 'instructor', 'admin') NOT NULL,
     PRIMARY KEY (mail),
     CONSTRAINT email_valido CHECK (mail REGEXP '^[A-Za-z0-9._%+-]+@(ucu\\.edu\\.uy|correo\\.ucu\\.edu\\.uy)$')
 );
@@ -72,7 +72,6 @@ CREATE TABLE obligatorio.alumno_clase (
     id_clase INT NOT NULL,
     id_alumno INT NOT NULL,
     id_equipamiento INT,
-    PRIMARY KEY (id_clase, id_alumno),
     FOREIGN KEY (id_clase) references clase(id) ON DELETE cascade,
     FOREIGN KEY (id_alumno) references alumno(ci) ON DELETE cascade,
     FOREIGN KEY (id_equipamiento) references equipamiento(id) ON DELETE set null

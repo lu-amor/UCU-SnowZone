@@ -2,15 +2,10 @@ import React, { useRef, useState } from "react";
 import classes from "./loginForm.module.css";
 import { useNavigate } from "react-router-dom";
 
-function LoginForm({ createAccount }) {
+function LoginForm() {
   const emailRef = useRef("");
   const passwordRef = useRef("");
   const navigate = useNavigate();
-
-  const handleCreateAccountBtn = () => {
-    // logica para crear cuenta here
-    createAccount();
-  };
 
   const handleLoginBtn = () => {
     const newEmail = emailRef.current.value;
@@ -27,6 +22,10 @@ function LoginForm({ createAccount }) {
     } else {
       alert("Invalid email or password");
     }
+  };
+
+  const handleForgotPassword = () => {
+    navigate("/forgot-password");
   };
 
   const handleKeyDown = (event) => {
@@ -80,9 +79,9 @@ function LoginForm({ createAccount }) {
           <div className={classes.buttonContainer}>
             <button
               style={{ font: "12px arial", marginBottom: "10px" }}
-              onClick={createAccount}
+              onClick={handleForgotPassword}
             >
-              Create account <strong>here</strong>
+              Forgot yor password?
             </button>
           </div>
         </div>

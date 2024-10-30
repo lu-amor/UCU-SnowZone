@@ -4,7 +4,7 @@ import classes from "./navBar.module.css";
 import Icon from '@mdi/react';
 import { mdiExitToApp, mdiMenu } from '@mdi/js';
 
-function AuthNavBarTS({ navItem }) {
+function AuthNavBarS({ navItem }) {
   const navigate = useNavigate();
   const [showDropdown, setShowDropdown] = useState(false);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
@@ -20,12 +20,12 @@ function AuthNavBarTS({ navItem }) {
     return () => window.removeEventListener('resize', updateWindowWidth);
   }, []);
 
-  const goHome = () => navigate("/home");
-  const goClasses = () => navigate("/classes");
-  const goActivities = () => navigate("/activities");
-  const goStudents = () => navigate("/students");
-  const goInstructors = () => navigate("/instructors");
-  const goShifts = () => navigate("/shifts");
+  const goHome = () => navigate("/homeStudent");
+  const goClasses = () => navigate("/classesS");
+  const goActivities = () => navigate("/activitiesS");
+  const goStudents = () => navigate("/studentsS");
+  const goInstructors = () => navigate("/instructorsS");
+  const goShifts = () => navigate("/shiftsS");
   const goLogout = () => navigate("/login");
 
   return (
@@ -106,4 +106,4 @@ function AuthNavBarTS({ navItem }) {
   );
 }
 
-export default AuthNavBarTS;
+export default AuthNavBarS;

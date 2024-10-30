@@ -6,7 +6,7 @@ const EditClassTeacherModal = ({ selectedClass, instructors, shifts, studentsArr
     const [students, setStudents] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [filteredStudents, setFilteredStudents] = useState([]);
-    const [activeTab, setActiveTab] = useState('todos');
+    const [activeTab, setActiveTab] = useState('inscriptos');
 -
     useEffect(() => {
         if (selectedClass) {
@@ -71,9 +71,6 @@ const EditClassTeacherModal = ({ selectedClass, instructors, shifts, studentsArr
 
                         <div className="tabs is-boxed is-right">
                             <ul>
-                                <li className={activeTab === 'todos' ? 'is-active' : ''} onClick={() => setActiveTab('todos')}>
-                                    <a>All</a>
-                                </li>
                                 <li className={activeTab === 'inscriptos' ? 'is-active' : ''} onClick={() => setActiveTab('inscriptos')}>
                                     <a>Enrolled</a>
                                 </li>
@@ -81,26 +78,8 @@ const EditClassTeacherModal = ({ selectedClass, instructors, shifts, studentsArr
                         </div>
 
                         <div className="field">
-                            {activeTab === 'todos' && filteredStudents.length > 0 && (
-                                <div className="box">
-                                    {filteredStudents.map((student) => (
-                                        <div key={student.id} className="field is-grouped is-grouped-multiline">
-                                            <p>{student}</p>
-                                            <button
-                                                type="button"
-                                                className="button is-small is-primary"
-                                                onClick={() => addStudent(student)}
-                                                style={{marginLeft: 'auto'}}
-                                            >
-                                                Agregar
-                                            </button>
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
-
                             {activeTab === 'inscriptos' && students.length > 0 && (
-                                <div className="box">
+                                <div className="box" style={{ maxHeight: '100px', overflowY: 'auto'}}>
                                     {students.map((student) => (
                                         <div key={student.id} className="field is-grouped is-grouped-multiline">
                                             <p>{student}</p>

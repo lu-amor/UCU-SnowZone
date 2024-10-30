@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import classes from "./studentCard.module.css";
 
-function StudentCard({ openEditModal, student, deleteStudent, updateStudent }) {
+function StudentCard({ openEditModal, student }) {
     return (
         <div className={classes.cardContainer}>
             <div className={classes.cardContent} onClick={openEditModal}>

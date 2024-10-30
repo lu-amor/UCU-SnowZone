@@ -1,17 +1,12 @@
-import React, {useState} from "react";
+import React from "react";
 import classes from "./shiftsPage.module.css";
 import ShiftCardTS from "../../components/shift/shiftCard/shiftCardTS";
-import AuthNavBar from "../../components/navBar/navBar";
+import AuthNavBarT from "../../components/navBar/navBarT";
 
-const shiftsPage = ({shiftsArray }) => {
-    const [shiftList, setShiftList] = useState([]);
-    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-    const [selectedShift, setSelectedShift] = useState(null);
-    const [isNewModalOpen, setIsNewModalOpen] = useState(false);
-
+const ShiftsPageT = ({shiftsArray}) => {
     return (
         <>
-            <AuthNavBar navItem="shifts" />
+            <AuthNavBarT navItem="shifts" />
             <div className={`${classes.content}`}>
                 <h1 className={`${classes.header} mb-4`}>Shifts</h1>
                 <div className={`${classes.cardsContainer}`}>
@@ -29,4 +24,4 @@ const shiftsPage = ({shiftsArray }) => {
     );
 };
 
-export default shiftsPage;
+export default ShiftsPageT;
