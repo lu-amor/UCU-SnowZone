@@ -86,8 +86,11 @@ CREATE TABLE obligatorio.alumno_clase (
     FOREIGN KEY (id_kit) REFERENCES equipamiento_kit(id) ON DELETE SET NULL
 );
 
+ALTER TABLE obligatorio.alumno_clase
+ADD COLUMN costo_total INT;
 
-USE obligatorio2;
+
+USE obligatorio;
 
 
 INSERT INTO obligatorio.login (mail, password, rol) VALUES
@@ -176,19 +179,68 @@ INSERT INTO obligatorio.clase (ci_instructor, id_actividad, id_turno, dictada, g
 (23456789, 2, 1, 1, 1),
 (90123456, 1, 2, 0, 1);
 
-INSERT INTO obligatorio.alumno_clase (id_clase, id_alumno, id_kit) VALUES
-(1, 23456888, 1),
-(1, 51234012, 2),
-(2, 60001234, 4),
-(2, 51324420, 5),
-(3, 42998999, 10),
-(4, 58789029, 6),
-(5, 48886577, NULL), /*Aca hay que decidir y justificar si les permitimos no alquilar kit (supongo que si)*/
-(1, 60001234, NULL);
+INSERT INTO obligatorio.alumno_clase (id_clase, id_alumno, id_kit, costo_total) VALUES
+(1, 23456888, 1, 1100),
+(1, 51234012, 2, 1100),
+(2, 60001234, 8, 800),
+(2, 51324420, 8,800),
+(3, 42998999, 13, 1100),
+(4, 58789029, 9, 800),
+(5, 48886577, NULL, 500),
+(1, 60001234, NULL, 500);
 
-/*Para chequear las edades de los incritos*/
+
 SELECT
     ci, nombre, apellido, f_nac,
     TIMESTAMPDIFF(YEAR, f_nac, CURDATE()) AS edad
 FROM
-    obligatorio2.alumno 
+    obligatorio.alumno;
+
+use obligatorio;
+CREATE TRIGGER verificar_edad_al_inscribirse
+BEFORE INSERT ON alumno_clase
+FOR EACH ROW
+BEGIN
+    DECLARE edad_alumno INT;
+    DECLARE min_edad INT;
+
+    SELECT TIMESTAMPDIFF(YEAR, f_nac, CURDATE()) INTO edad_alumno
+    FROM alumno
+    WHERE ci = NEW.id_alumno;
+
+    SELECT min_edad INTO min_edad
+    FROM actividades
+    WHERE id = (SELECT id_actividad FROM clase WHERE id = NEW.id_clase);
+
+    IF edad_alumno < min_edad THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'El alumno no cumple con la edad mínima para esta actividad';
+    END IF;
+END;
+
+
+CREATE TABLE obligatorio.clase_dictada (
+    id_clase INT NOT NULL ,
+    fecha DATE NOT NULL,
+    PRIMARY KEY (id_clase, fecha),
+    FOREIGN KEY (id_clase) REFERENCES clase(id) ON DELETE CASCADE
+);
+
+CREATE TRIGGER after_update_clases_dictada
+AFTER UPDATE ON clase
+FOR EACH ROW
+BEGIN
+    IF NEW.dictada = TRUE AND OLD.dictada = FALSE THEN
+        INSERT INTO clase_dictada (id_clase, fecha)
+        VALUES (NEW.id, CURDATE());
+    END IF;
+END;
+
+CREATE TRIGGER before_delete_clase
+BEFORE DELETE ON clase
+FOR EACH ROW
+BEGIN
+    UPDATE clase_dictada
+    SET id_clase = -1
+    WHERE id_clase = OLD.id;
+END;
