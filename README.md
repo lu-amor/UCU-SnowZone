@@ -10,7 +10,7 @@ This project is a web aplication designed to manage UCU Winter Sports School
 
 2. Navigate to the project directory:
    ```bash
-   cd .\obligatorio\
+   cd .\frontend\
 
 3. Install the dependencies
    ```bash
