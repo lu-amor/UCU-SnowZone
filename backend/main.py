@@ -10,7 +10,6 @@ app.secret_key = 'your_secret_key'
 login_manager = LoginManager()
 login_manager.init_app(app)
 
-# Simulación de un usuario
 users = {'admin': 'password123'}
 
 class User(UserMixin):
@@ -49,6 +48,64 @@ def logout():
 @login_required
 def protected():
     return "Esta es un área protegida."
+
+@app.route('/api/actividades', methods=['GET'])
+def api_actividades():
+    cursor.execute("SELECT * FROM actividades")
+    value = cursor.fetchall()
+    return jsonify(value)
+
+@app.route('/api/add_actividad', methods=['POST'])
+def api_add_actividad():
+    data = request.json
+    descripcion = data.get('descripcion')
+    costo = data.get('costo')
+    min_edad = data.get('min_edad')
+    
+    try:
+        cursor.execute("INSERT INTO actividades (descripcion, costo, min_edad) VALUES (%s, %s, %s)", (descripcion, costo, min_edad))
+        connection.commit()
+        return jsonify({"message": "Actividad agregada correctamente"}), 201
+    except Exception as e:
+        connection.rollback()
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/api/update_actividad/<int:id>', methods=['PATCH'])
+def api_update_actividad(id):
+    data = request.json
+    fields = []
+    values = []
+
+    if 'descripcion' in data:
+        fields.append('descripcion = %s')
+        values.append(data['descripcion'])
+    if 'costo' in data:
+        fields.append('costo = %s')
+        values.append(data['costo'])
+    if 'min_edad' in data:
+        fields.append('min_edad = %s')
+        values.append(data['min_edad'])
+
+    if not fields:
+        return jsonify({"error": "No fields provided for update"}), 400
+
+    try:
+        cursor.execute("UPDATE actividades SET " + ', '.join(fields) + " WHERE id = %s", values + [id])
+        connection.commit()
+        return jsonify({"message": "Actividad actualizada correctamente"}), 200
+    except Exception as e:
+        connection.rollback()
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/api/delete_actividad/<int:id>', methods=['DELETE'])
+def api_delete_actividad(id):
+    try:
+        cursor.execute("DELETE FROM actividades WHERE id = %s", (id,))
+        connection.commit()
+        return jsonify({"message": "Actividad eliminada correctamente"}), 200
+    except Exception as e:
+        connection.rollback()
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
     app.run(debug=True)
