@@ -1,3 +1,4 @@
+import React, { useState, useEffect } from 'react';
 import './App.css'
 import Home from './pages/home/home'
 import HomeTeacher from './pages/home/homeTeacher'
@@ -30,37 +31,199 @@ import ReportsPage from './pages/reports/reportsPage'
 import { Routes, Route, Navigate } from 'react-router-dom'
 
 function App() {
-  const classesArray = [
-    {id: 1, activity: "Actividad 1", from: "09:00", to: "11:00", instructor: 'instructor 1', taught: false, grupal: true, students: ['student 1', 'student 2']},
-    {id: 2, activity: "Actividad 2", from: "13:00", to: "15:00", instructor: 'instructor 2', taught: true, grupal: true, students: ['student 1', 'student 2']},
-    {id: 3, activity: "Actividad 3", from: "15:00", to: "17:00", instructor: 'instructor 3', taught: false, grupal: false, students: ['student 1']},
-  ];
+  const urlActivities = "http://localhost:5000/api/activities";
+  const urlClasses = "http://localhost:5000/api/classes";
+  const urlStudents = "http://localhost:5000/api/students";
+  const urlInstructors = "http://localhost:5000/api/instructors";
+  const urlShifts = "http://localhost:5000/api/shifts";
+  const urlReports = "http://localhost:5000/api/reports";
+  const [activitiesArray, setActivitiesArray] = useState([]);
+  const [classesArray, setClassesArray] = useState([]);
+  const [studentsArray, setStudentsArray] = useState([]);
+  const [instructorsArray, setInstructorsArray] = useState([]);
+  const [shiftsArray, setShiftsArray] = useState([]);
+  let [reportsArray, setReportsArray] = useState([]);
 
-  const activitiesArray = [
-    {id: 1, name: "Actividad 1", cost: 25},
-    {id: 2, name: "Actividad 2", cost: 50},
-    {id: 3, name: "Actividad 3", cost: 100},
-  ];
+  const fetchDataAsync = async (url) => {
+    try {
+      const response = await fetch(url, { method: "GET" });
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error("Error to obtain data:", error.message);
+    }
+  };
 
-  const studentsArray = [
-    {id: 1, name: "Estudiante 1", surname: 'Surname 1', birthdate: '21-05-2004', phone: '111222333', email: 'student1@mail.com'},
-    {id: 2, name: "Estudiante 2", surname: 'Surname 2', birthdate: '22-05-2004', phone: '111222333', email: 'student2@mail.com'},
-    {id: 3, name: "Estudiante 3", surname: 'Surname 3', birthdate: '23-05-2004', phone: '111222333', email: 'student3@mail.com'},
-  ];
+  const addDataAsync = async ({url, item}) => {
+    try {
+      const response = await axios.post(url, 
+        item,
+        { withCredentials: true }
+      );
+      console.log(response.data.message);
+    } catch (error) {
+      console.error("Error to add data:", error.message);
+    }
+  };
 
-  const instructorsArray = [  
-    {id: 1, name: "Instructor 1", surname: 'Surname 1', birthdate: '21-05-2004', phone: '111222333', email: 'instructor1@mail.com'},
-    {id: 2, name: "Instructor 2", surname: 'Surname 2', birthdate: '22-05-2004', phone: '111222333', email: 'instructor2@mail.com'},
-    {id: 3, name: "Instructor 3", surname: 'Surname 3', birthdate: '23-05-2004', phone: '111222333', email: 'instructor3@mail.com'},
-  ];
+  const updateDataAsync = async ({url, updatedItem}) => {
+    try {
+      const response = await fetch(`${url}/${updatedItem.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(updatedItem),
+      }
+      );
+      console.log(response.data.message);
+    } catch (error) {
+      console.error("Error to update data:", error.message);
+    }
+  };
 
-  const shiftsArray = [
-    {id: 1, from: "09:00", to: "11:00"},
-    {id: 2, from: "11:00", to: "13:00"},
-    {id: 3, from: "15:00", to: "17:00"},
-  ];
+  const deleteDataAsync = async ({url, item}) => {
+    try {
+      await fetch(`${url}/${item.id}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+    } catch (error) {
+      console.error("Error to delete data:", error.message);
+    }
+  };
 
-  const reportsArray = [
+  const addActivity = async (activity) => {
+    const newActivityWithId = await addDataAsync({ url: urlActivities, item: activity });
+    setActivitiesArray([...activitiesArray, newActivityWithId]);
+  };
+
+  const updateActivity = (updatedActivity) => {
+    updateDataAsync({ url: urlActivities, updatedItem: updatedActivity });
+    setActivitiesArray([
+      ...activitiesArray.map((activity) =>
+        activity.id === updatedActivity.id ? updatedActivity : activity
+      ),
+    ]);
+  };
+
+  const deleteActivity = (activity) => {
+    deleteDataAsync({ url: urlActivities, item: activity }).then(() => {
+      setActivitiesArray(activitiesArray.filter((act) => act.id !== activity.id));
+    });
+  };
+
+  const addClass = async (newClass) => {
+    const newClassWithId = await addDataAsync({ url: urlClasses, item: newClass });
+    setClassesArray([...classesArray, newClassWithId]);
+  }
+
+  const updateClass = (updatedClass) => {
+    updateDataAsync({ url: urlClasses, updatedItem: updatedClass });
+    setClassesArray([
+      ...classesArray.map((classItem) =>
+        classItem.id === updatedClass.id ? updatedClass : classItem
+      ),
+    ]);
+  }
+
+  const deleteClass = (classItem) => {
+    deleteDataAsync({ url: urlClasses, item: classItem }).then(() => {
+      setClassesArray([classesArray.filter((classItem) => classItem.id !== classItem.id)]);
+    });
+  }
+
+  const addStudent = async (student) => {
+    const newStudentWithId = await addDataAsync({ url: urlStudents, item: student });
+    setStudentsArray([...studentsArray, newStudentWithId]);
+  }
+
+  const updateStudent = (updatedStudent) => {
+    updateDataAsync({ url: urlStudents, updatedItem: updatedStudent });
+    setStudentsArray([
+      ...studentsArray.map((student) =>
+        student.id === updatedStudent.id ? updatedStudent : student
+      ),
+    ]);
+  }
+
+  const deleteStudent = (student) => {
+    deleteDataAsync({ url: urlStudents, item: student }).then(() => {
+      setStudentsArray([studentsArray.filter((student) => student.id !== student.id)]);
+    });
+  }
+
+  const addInstructor = async (instructor) => {
+    const newInstructorWithId = await addDataAsync({ url: urlInstructors, item: instructor });
+    setInstructorsArray([...instructorsArray, newInstructorWithId]);
+  }
+
+  const updateInstructor = (updatedInstructor) => {
+    updateDataAsync({ url: urlInstructors, updatedItem: updatedInstructor });
+    setInstructorsArray([
+      ...instructorsArray.map((instructor) =>
+        instructor.id === updatedInstructor.id ? updatedInstructor : instructor
+      ),
+    ]);
+  }
+
+  const deleteInstructor = (instructor) => {
+    deleteDataAsync({ url: urlInstructors, item: instructor }).then(() => {
+      setInstructorsArray([...instructorsArray.filter((instructor) => instructor.id !== instructor.id)]);
+    });
+  }
+
+  const addShift = async (shift) => {
+    const newShiftWithId = await addDataAsync({ url: urlShifts, item: shift });
+    setShiftsArray([...shiftsArray, newShiftWithId]);
+  }
+
+  const updateShift = (updatedShift) => {
+    updateDataAsync({ url: urlShifts, updatedItem: updatedShift });
+    setShiftsArray([
+      ...shiftsArray.map((shift) =>
+        shift.id === updatedShift.id ? updatedShift : shift
+      ),
+    ]);
+  }
+
+  const deleteShift = (shift) => {
+    deleteDataAsync({ url: urlShifts, item: shift }).then(() => {
+      setShiftsArray([...shiftsArray.filter((shift) => shift.id !== shift.id)]);
+    });
+  }
+
+  useEffect(() => {
+    let activitiesPromise = fetchDataAsync(urlActivities);
+/*     let classesPromise = fetchDataAsync(urlClasses); */
+    let studentsPromise = fetchDataAsync(urlStudents);
+    let instructorsPromise = fetchDataAsync(urlInstructors);
+/*     let shiftsPromise = fetchDataAsync(urlShifts);
+    let reportsPromise = fetchDataAsync(urlReports); */
+
+/*     activitiesPromise.then((data) => {
+      setActivitiesArray([...data]);
+    });
+/*     classesPromise.then((data) => {
+      setClassesArray([...data]);
+    }); *//*
+    studentsPromise.then((data) => {
+      setStudentsArray([...data]);
+    });
+    instructorsPromise.then((data) => {
+      setInstructorsArray([...data]);
+    }); */
+/*     shiftsPromise.then((data) => {
+      setShiftsArray([...data]);
+    });
+    reportsPromise.then((data) => {
+      setReportsArray([...data]);
+    }); */
+  }, []);
+
+  reportsArray = [
     {
       type: "Income per activity",
       data: [
@@ -86,6 +249,8 @@ function App() {
       ]
     }
   ];
+
+  console.log(activitiesArray);
 
   return (
     <Routes>
@@ -125,4 +290,4 @@ function App() {
   )
 }
 
-export default App
+export default App;
