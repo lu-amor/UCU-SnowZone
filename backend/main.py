@@ -53,7 +53,6 @@ def get_contacts():
         return (
             jsonify({"message": str(e)}), 400
         )
-        
 
 @app.route("/create_student", methods=["POST"])
 def create_student():
@@ -88,6 +87,10 @@ def create_student():
         return jsonify({"message": str(e)}),400
 
     return jsonify({"message": "Alumno creado correctamente"}), 201
+
+#patch & delete
+#con instructores, shifts, actividades, clases, equipamiento, alumno-clase
+#pensar selects de reportes
 
 @app.route('/logout')
 @login_required
