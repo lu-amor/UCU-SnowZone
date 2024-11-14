@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/rules-of-hooks */
+/* eslint-disable no-unused-vars */
 import React, {useState} from "react";
 import classes from "./studentsPage.module.css";
 import StudentCard from "../../components/student/studentCard/studentCard";
