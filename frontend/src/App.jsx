@@ -43,69 +43,11 @@ function App() {
     setStudentsArray(data.students)
   };
 
-  const urlActivities = "http://localhost:5000/api/activities";
-  const urlClasses = "http://localhost:5000/api/classes";
-  const urlStudents = "http://localhost:5000/api/students";
-  const urlInstructors = "http://localhost:5000/api/instructors";
-  const urlShifts = "http://localhost:5000/api/shifts";
-  const urlReports = "http://localhost:5000/api/reports";
-  const [activitiesArray, setActivitiesArray] = useState([]);
-  const [classesArray, setClassesArray] = useState([]);
-  const [studentsArray, setStudentsArray] = useState([]);
-  const [instructorsArray, setInstructorsArray] = useState([]);
-  const [shiftsArray, setShiftsArray] = useState([]);
-  let [reportsArray, setReportsArray] = useState([]);
-
-  const fetchDataAsync = async (url) => {
-    try {
-      const response = await fetch(url, { method: "GET" });
-      const data = await response.json();
-      return data;
-    } catch (error) {
-      console.error("Error to obtain data:", error.message);
-    }
-  };
-
-  const addDataAsync = async ({url, item}) => {
-    try {
-      const response = await axios.post(url, 
-        item,
-        { withCredentials: true }
-      );
-      console.log(response.data.message);
-    } catch (error) {
-      console.error("Error to add data:", error.message);
-    }
-  };
-
-  const updateDataAsync = async ({url, updatedItem}) => {
-    try {
-      const response = await fetch(`${url}/${updatedItem.id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(updatedItem),
-      }
-      );
-      console.log(response.data.message);
-    } catch (error) {
-      console.error("Error to update data:", error.message);
-    }
-  };
-
-  const deleteDataAsync = async ({url, item}) => {
-    try {
-      await fetch(`${url}/${item.id}`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-    } catch (error) {
-      console.error("Error to delete data:", error.message);
-    }
-  };
+  const classesArray = [
+    {id: 1, activity: "Actividad 1", from: "09:00", to: "11:00", instructor: 'instructor 1', taught: false, grupal: true, students: ['student 1', 'student 2']},
+    {id: 2, activity: "Actividad 2", from: "13:00", to: "15:00", instructor: 'instructor 2', taught: true, grupal: true, students: ['student 1', 'student 2']},
+    {id: 3, activity: "Actividad 3", from: "15:00", to: "17:00", instructor: 'instructor 3', taught: false, grupal: false, students: ['student 1']},
+  ];
 
   const activitiesArray = [
     {id: 1, name: "Actividad 1", cost: 25},
