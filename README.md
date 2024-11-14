@@ -10,7 +10,7 @@ This project is a web aplication designed to manage UCU Winter Sports School
 
 2. Navigate to the project directory:
    ```bash
-   cd .\obligatorio\
+   cd .\frontend\
 
 3. Install the dependencies
    ```bash
@@ -22,3 +22,17 @@ This project is a web aplication designed to manage UCU Winter Sports School
 4. Run de project:
    ```bash
    npm run dev
+
+5. From another terminal navigate to the project directory:
+   ```bash
+   cd .\backend\
+
+6. Install the dependencies
+   ```bash
+   .\env\Scripts\Activate
+   python3 -m pip install -r requirements.txt
+
+7. Run de project
+   ```bash
+   python3 main.py
+   
