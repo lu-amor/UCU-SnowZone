@@ -38,57 +38,6 @@ def login():
 
     return render_template('login.html')
 
-@app.route("/students", methods=["GET"])
-def get_contacts():
-    try:
-        connection = get_db_connection()
-        cursor = connection.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM alumno")
-        students = cursor.fetchall()
-        #json_students = list(map(lambda x: x.to_json(), students))
-        cursor.close()
-        connection.close()
-        return jsonify({"students": students})
-    except Exception as e:
-        return (
-            jsonify({"message": str(e)}), 400
-        )
-        
-
-@app.route("/create_student", methods=["POST"])
-def create_student():
-    cedula = request.json.get("ci")
-    nombre = request.json.get("nombre")
-    apellido = request.json.get("apellido")
-    f_nac = request.json.get("f_nac")
-    mail = request.json.get("mail")
-    tel = request.json.get("tel")
-
-    if not cedula or not nombre or not apellido or not f_nac or not mail or not tel:
-        return (
-            jsonify({"message": "Completar informacion del estudiante"}),
-            400,
-        )
-    
-    try:
-        connection = get_db_connection()
-        cursor = connection.cursor()
-
-        new_student = """
-            INSERT INTO alumno (ci, nombre, apellido, f_nac, mail, tel)
-            VALUES (%s, %s, %s, %s, %s, %s)
-        """
-        cursor.execute(new_student, (cedula, nombre, apellido, f_nac, mail, tel))
-        connection.commit()
-
-        cursor.close()
-        connection.close()
-
-    except Exception as e:
-        return jsonify({"message": str(e)}),400
-
-    return jsonify({"message": "Alumno creado correctamente"}), 201
-
 @app.route('/logout')
 @login_required
 def logout():
@@ -100,8 +49,107 @@ def logout():
 def protected():
     return "Esta es un área protegida."
 
-@app.route('/api/actividades', methods=['GET'])
+@app.route("/students/<int:student_id>", methods=["GET", "POST", "DELETE", "PATCH"])
+def students(student_id):
+    if request.method == 'POST':
+        cedula = request.json.get("ci")
+        nombre = request.json.get("nombre")
+        apellido = request.json.get("apellido")
+        f_nac = request.json.get("f_nac")
+        mail = request.json.get("mail")
+        tel = request.json.get("tel")
+
+        if not cedula or not nombre or not apellido or not f_nac or not mail or not tel:
+            return (
+                jsonify({"message": "Completar informacion del estudiante"}),
+                400,
+            )
+        
+        try:
+            connection = get_db_connection()
+            cursor = connection.cursor()
+
+            new_student = """
+                INSERT INTO alumno (ci, nombre, apellido, f_nac, mail, tel)
+                VALUES (%s, %s, %s, %s, %s, %s)
+            """
+            cursor.execute(new_student, (cedula, nombre, apellido, f_nac, mail, tel))
+            connection.commit()
+
+            cursor.close()
+            connection.close()
+
+        except Exception as e:
+            return jsonify({"message": str(e)}),400
+
+        return jsonify({"message": "Alumno creado correctamente"}), 201
+    if request.method == 'GET':
+        try:
+            connection = get_db_connection()
+            cursor = connection.cursor(dictionary=True)
+            cursor.execute("SELECT * FROM alumno")
+            students = cursor.fetchall()
+            #json_students = list(map(lambda x: x.to_json(), students))
+            cursor.close()
+            connection.close()
+            return jsonify({"students": students})
+        except Exception as e:
+            return (jsonify({"message": str(e)}), 400
+        )
+    if request.method == 'DELETE':
+        try:
+            connection = get_db_connection()
+            cursor = connection.cursor(dictionary=True)
+            cursor.execute("DELETE FROM alumno WHERE ci = %s", (student_id,))
+            connection.commit()
+            cursor.close()
+            connection.close()
+        except Exception as e:
+            cursor.close()
+            connection.close()  
+            return jsonify({"message": str(e)}),400
+        return jsonify({"message": "Alumno eliminado correctamente"}), 201
+    if request.method == 'PATCH':
+        data = request.json
+        fields = []
+        values = []
+
+        if 'ci' in data:
+            fields.append('ci = %s')
+            values.append(data['ci'])
+        if 'nombre' in data:
+            fields.append('nombre = %s')
+            values.append(data['nombre'])
+        if 'apellido' in data:
+            fields.append('apellido = %s')
+            values.append(data['apellido'])
+        if 'f_nac' in data:
+            fields.append('f_nac = %s')
+            values.append(data['f_nac'])
+        if 'mail' in data:
+            fields.append('mail = %s')
+            values.append(data['mail'])
+        if 'tel' in data:
+            fields.append('tel = %s')
+            values.append(data['tel'])
+
+        if not fields:
+            return jsonify({"error": "No hay campos para actualizar"}), 400
+
+        try:
+            connection = get_db_connection()
+            cursor = connection.cursor()
+            cursor.execute("UPDATE alumno SET " + ', '.join(fields) + " WHERE ci = %s", values + [student_id])
+            connection.commit()
+            return jsonify({"message": "Alumno actualizado correctamente"}), 200
+        except Exception as e:
+            connection.rollback()
+            return jsonify({"error": str(e)}), 500
+    
+@app.route('/actividades', methods=['GET'])
 def api_actividades():
+    connection = get_db_connection()
+    cursor = connection.cursor()
     cursor.execute("SELECT * FROM actividades")
     value = cursor.fetchall()
     return jsonify(value)
@@ -118,7 +166,6 @@ def api_add_actividad():
         connection.commit()
         return jsonify({"message": "Actividad agregada correctamente"}), 201
     except Exception as e:
-        connection.rollback()
         return jsonify({"error": str(e)}), 500
 
 @app.route('/api/update_actividad/<int:id>', methods=['PATCH'])
@@ -141,6 +188,8 @@ def api_update_actividad(id):
         return jsonify({"error": "No fields provided for update"}), 400
 
     try:
+        connection = get_db_connection()
+        cursor = connection.cursor()
         cursor.execute("UPDATE actividades SET " + ', '.join(fields) + " WHERE id = %s", values + [id])
         connection.commit()
         return jsonify({"message": "Actividad actualizada correctamente"}), 200
@@ -151,6 +200,8 @@ def api_update_actividad(id):
 @app.route('/api/delete_actividad/<int:id>', methods=['DELETE'])
 def api_delete_actividad(id):
     try:
+        connection = get_db_connection()
+        cursor = connection.cursor()
         cursor.execute("DELETE FROM actividades WHERE id = %s", (id,))
         connection.commit()
         return jsonify({"message": "Actividad eliminada correctamente"}), 200

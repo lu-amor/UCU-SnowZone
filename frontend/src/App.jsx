@@ -1,3 +1,5 @@
+import { useState, useEffect } from 'react'
+import StudentList from './StudentList'
 import './App.css'
 import Home from './pages/home/home'
 import HomeTeacher from './pages/home/homeTeacher'
@@ -30,6 +32,17 @@ import ReportsPage from './pages/reports/reportsPage'
 import { Routes, Route, Navigate } from 'react-router-dom'
 
 function App() {
+  const [students, setStudents] = useState([])
+
+  useEffect(() => {
+    fetchStudents()
+  }, [])
+  const fetchStudents = async () => {
+    const response = await fetch("http://127.0.0.1:5000/students")
+    const data = await response.json()
+    setStudents(data.students)
+    console.log(data.students)
+  }
   const classesArray = [
     {id: 1, activity: "Actividad 1", from: "09:00", to: "11:00", instructor: 'instructor 1', taught: false, grupal: true, students: ['student 1', 'student 2']},
     {id: 2, activity: "Actividad 2", from: "13:00", to: "15:00", instructor: 'instructor 2', taught: true, grupal: true, students: ['student 1', 'student 2']},
