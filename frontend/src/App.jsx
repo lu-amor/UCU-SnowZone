@@ -37,10 +37,41 @@ function App() {
   useEffect(() => {
     fetchStudents()
   }, []);
+
   const fetchStudents = async () => {
     const response = await fetch("http://127.0.0.1:5000/students")
     const data = await response.json()
     setStudentsArray(data.students)
+  };
+
+  async function postStudentAW ( student ) {
+    try {
+      const response = await fetch("http://127.0.0.1:5000/students", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify( student ),
+      });
+
+      const newStudent = await response.json();
+      return newStudent; 
+    } catch (error) {
+      console.log("Error posting data: ", error);
+    }
+  }
+
+  const addStudent = async (ci, nombre, apellido, f_nac, mail, tel ) => {
+    const newStudent = {
+      ci: ci,
+      nombre: nombre,
+      apellido: apellido,
+      f_nac: f_nac,
+      mail: mail,
+      tel: tel
+    };
+    const student = await postStudentAW(newStudent);
+    setStudentsArray([...studentsArray, student]);
   };
 
   const classesArray = [
@@ -94,8 +125,6 @@ function App() {
     }
   ];
 
-  console.log(activitiesArray);
-
   return (
     <Routes>
       <Route path="/*" element={<Navigate replace to="/login" />} />
@@ -116,7 +145,7 @@ function App() {
         <Route path="/activitiesT" element={<ActivitiesPageT activitiesArray={activitiesArray}/>}></Route>
         <Route path="/activitiesS" element={<ActivitiesPageS activitiesArray={activitiesArray}/>}></Route>
 
-        <Route path="/students" element={<StudentsPage studentsArray={studentsArray}/>}></Route>
+        <Route path="/students" element={<StudentsPage studentsArray={studentsArray} addStudent={addStudent}/>}></Route>
         <Route path="/studentsT" element={<StudentsPageT studentsArray={studentsArray}/>}></Route>
         <Route path="/studentsS" element={<StudentsPageS studentsArray={studentsArray}/>}></Route>
 

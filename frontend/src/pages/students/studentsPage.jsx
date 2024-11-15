@@ -8,7 +8,6 @@ import EditStudentModal from "../../components/student/editStudentModal/editStud
 import NewStudentModal from "../../components/student/newStudentModal/newStudent";
 
 const studentsPage = ({studentsArray, addStudent, updateStudent, deleteStudent}) => {
-    const [studentList, setStudentList] = useState([]);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [selectedStudent, setSelectedStudent] = useState(null);
     const [isNewModalOpen, setIsNewModalOpen] = useState(false);
@@ -22,20 +21,21 @@ const studentsPage = ({studentsArray, addStudent, updateStudent, deleteStudent})
                     <button
                         id="addStudentButton"
                         className={`button is-primary ${classes.addStudentButton}`}
-                        onClick={() => setIsNewModalOpen(true)}>add Student</button>
+                        onClick={() => setIsNewModalOpen(true)}>add Student
+                    </button>
                 </div>
                 <div className={`${classes.cardsContainer}`}>
                     {studentsArray.map((student) => {
                         return (
                             <StudentCard
-                            key={student.id}
-                            student={student}
-                            deleteStudent={deleteStudent}
-                            updateStudent={updateStudent}
-                            openEditModal={() => {
-                                setSelectedStudent(student);
-                                setIsEditModalOpen(true);
-                            }}
+                                key={student.ci}
+                                student={student}
+                                deleteStudent={deleteStudent}
+                                updateStudent={updateStudent}
+                                openEditModal={() => {
+                                    setSelectedStudent(student);
+                                    setIsEditModalOpen(true);
+                                }}
                             />
                         );
                     })}

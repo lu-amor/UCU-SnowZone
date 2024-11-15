@@ -32,7 +32,7 @@ const EditStudentModal = ({ selectedStudent, closeModal, updateStudent, deleteSt
                         </div>
                         <div className="field is-grouped">
                             <label className="label">CI: {selectedStudent.ci}</label>
-                            <label className="label">Birthdate: {selectedStudent.f_nac}</label>
+                            <label className="label">Birthdate: {selectedStudent.f_nac.split('00:00')[0].split(', ')[1]}</label>
                         </div>
                         <div className="field">
                             <label className="label">Tel: {selectedStudent.tel}</label>

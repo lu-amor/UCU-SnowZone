@@ -54,16 +54,16 @@ def get_contacts():
             jsonify({"message": str(e)}), 400
         )
 
-@app.route("/create_student", methods=["POST"])
+@app.route("/students", methods=["POST"])
 def create_student():
-    cedula = request.json.get("ci")
+    ci = request.json.get("ci")
     nombre = request.json.get("nombre")
     apellido = request.json.get("apellido")
     f_nac = request.json.get("f_nac")
     mail = request.json.get("mail")
     tel = request.json.get("tel")
 
-    if not cedula or not nombre or not apellido or not f_nac or not mail or not tel:
+    if not ci or not nombre or not apellido or not f_nac or not mail or not tel:
         return (
             jsonify({"message": "Completar informacion del estudiante"}),
             400,
@@ -77,14 +77,18 @@ def create_student():
             INSERT INTO alumno (ci, nombre, apellido, f_nac, mail, tel)
             VALUES (%s, %s, %s, %s, %s, %s)
         """
-        cursor.execute(new_student, (cedula, nombre, apellido, f_nac, mail, tel))
+        
+        print(ci, nombre, apellido, f_nac, mail, tel)
+        cursor.execute(new_student, (ci, nombre, apellido, f_nac, mail, tel))
         connection.commit()
 
         cursor.close()
         connection.close()
 
     except Exception as e:
-        return jsonify({"message": str(e)}),400
+        print(e)
+        return jsonify({"message": str(e)}),400 
+
 
     return jsonify({"message": "Alumno creado correctamente"}), 201
 
