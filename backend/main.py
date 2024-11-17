@@ -2,6 +2,8 @@ from flask import Flask, render_template, redirect, url_for, request, flash, jso
 from flask_login import LoginManager, login_user, logout_user, login_required, UserMixin
 from flask_cors import CORS
 from config import app, get_db_connection
+from datetime import datetime
+
 
 app = Flask(__name__)
 
@@ -208,19 +210,28 @@ def get_clase(id):
 @app.route("/delete_clase/<int:id>", methods=["DELETE"])
 def delete_clase(id):
     try:
+        # Verificar si la clase está en su horario
+        if verificar_horario_clase(id):
+            return jsonify({"error": "No se puede eliminar la clase durante su horario"}), 403
+        
         connection = get_db_connection()
         cursor = connection.cursor(dictionary=True)
-        cursor.execute("DELETE FROM clase WHERE id = %s", (id,))
+
+        # Eliminar la clase de la base de datos
+        cursor.execute("DELETE FROM obligatorio.clase WHERE id = %s", (id,))
         connection.commit()
+
         cursor.close()
         connection.close()
+
         return jsonify({"message": "Clase eliminada correctamente"}), 200
+    
     except Exception as e:
         connection.rollback()
         cursor.close()
         connection.close()
         return jsonify({"error": str(e)}), 500
-
+    
 #ADD CLASE
 @app.route("/add_clase", methods=["POST"])
 def add_clase():
@@ -263,53 +274,103 @@ def add_clase():
 
 
 #UPDATE CLASE
-@app.route("/update_clase/<int:id>", methods=["PATCH"])
-def update_clase(id):
+@app.route("/update_clase/<int:id_clase>", methods=["PATCH"])
+def update_clase(id_clase):
     data = request.json
+    id_instructor = data.get("id_instructor")  
+    id_turno = data.get("id_turno")  
+
     fields = []
     values = []
-
-    if "ci_instructor" in data:
-        fields.append("ci_instructor = %s")
-        values.append(data["ci_instructor"])
-    if "id_actividad" in data:
-        fields.append("id_actividad = %s")
-        values.append(data["id_actividad"])
-    if "id_turno" in data:
-        fields.append("id_turno = %s")
-        values.append(data["id_turno"])
-
-    if not fields:
-        return jsonify({"error": "No se proporcionaron campos para actualizar"}), 400
-
-    values.append(id)
 
     try:
         connection = get_db_connection()
         with connection.cursor(dictionary=True, buffered=True) as cursor:
+            
             # Validar si el instructor ya tiene una clase en el mismo turno
-            if "ci_instructor" in data and "id_turno" in data:
+            if id_instructor and id_turno:
                 cursor.execute(
-                    "SELECT * FROM clase WHERE ci_instructor = %s AND id_turno = %s AND id != %s",
-                    (data["ci_instructor"], data["id_turno"], id)
+                    "SELECT * FROM obligatorio.clase WHERE ci_instructor = %s AND id_turno = %s AND id != %s",
+                    (id_instructor, id_turno, id_clase)
                 )
                 existing_class = cursor.fetchone()
                 if existing_class:
                     return jsonify({"error": "El instructor ya tiene una clase asignada en este turno"}), 400
 
+            # Verificar si se permite modificar la clase en este momento (horario)
+            if not verificar_horario_clase(id_clase):
+                return jsonify({"error": "No se puede modificar la clase durante su horario"}), 403
+
+            if id_instructor:
+                fields.append("id_instructor = %s")
+                values.append(id_instructor)
+            if id_turno:
+                fields.append("id_turno = %s")
+                values.append(id_turno)
+
+            if not fields:
+                return jsonify({"error": "No se proporcionaron campos para modificar"}), 400
+
             # Actualizar la clase
-            query = f"UPDATE clase SET {', '.join(fields)} WHERE id = %s"
-            cursor.execute(query, tuple(values))
+            query = f"UPDATE obligatorio.clase SET {', '.join(fields)} WHERE id = %s"
+            cursor.execute(query, tuple(values) + (id_clase,))
             connection.commit()
 
-        connection.close()
-        return jsonify({"message": "Clase actualizada correctamente"}), 200
+            return jsonify({"message": "Clase actualizada exitosamente"}), 200
+
     except Exception as e:
         if connection:
             connection.rollback()
-            connection.close()
         return jsonify({"error": str(e)}), 500
 
+    finally:
+        if connection:
+            connection.close()
+
+
+#FUNCION HORARIO
+def verificar_horario_clase(id_clase):
+    try:
+        connection = get_db_connection()
+        with connection.cursor(dictionary=True) as cursor:
+            cursor.execute("SELECT id_turno FROM obligatorio.clase WHERE id = %s", (id_clase,))
+            clase = cursor.fetchone()
+
+            if clase:
+                id_turno = clase["id_turno"]
+                
+                # Obtener el turno de la clase
+                cursor.execute("SELECT hora_inicio, hora_fin FROM obligatorio.turno WHERE id = %s", (id_turno,))
+                turno = cursor.fetchone()
+
+                if turno:
+                    hora_inicio = turno["hora_inicio"]
+                    hora_fin = turno["hora_fin"]
+
+                    # extraemos la parte de la hora, minutos y segundos
+                    if isinstance(hora_inicio, timedelta):
+                        hora_inicio = (datetime.min + hora_inicio).time()
+                    if isinstance(hora_fin, timedelta):
+                        hora_fin = (datetime.min + hora_fin).time()
+
+                    # Obtener la hora actual como un objeto datetime.time
+                    hora_actual = datetime.now().time()  # (no la fecha)
+
+                    # Compara la hora actual con el rango de la clase
+                    if hora_inicio <= hora_actual <= hora_fin:
+                        print(f"La clase está en su horario: {hora_inicio} <= {hora_actual} <= {hora_fin}")
+                        return False
+                    else:
+                        print(f"La clase NO está en su horario: {hora_inicio} <= {hora_actual} <= {hora_fin}")
+                        return True
+
+        return False
+    except Exception as e:
+        print(f"Error en verificar_horario_clase: {str(e)}")
+        return False
+    finally:
+        if connection:
+            connection.close()
 
 
 # --------------------------------- <3Rutas de Equipamiento :) ---------------------------------
@@ -663,6 +724,8 @@ def update_inscripcion(id_clase, id_alumno):
             cursor.close()
         if connection:
             connection.close()
+
+
 
 if __name__ == "__main__":
     app.run(debug=True)
