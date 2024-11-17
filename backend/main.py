@@ -2,7 +2,7 @@ from flask import Flask, render_template, redirect, url_for, request, flash, jso
 from flask_login import LoginManager, login_user, logout_user, login_required, UserMixin
 from flask_cors import CORS
 from config import app, get_db_connection
-from datetime import datetime
+from datetime import datetime, timedelta 
 
 
 app = Flask(__name__)
@@ -329,6 +329,7 @@ def update_clase(id_clase):
 
 
 #FUNCION HORARIO
+# FUNCION HORARIO
 def verificar_horario_clase(id_clase):
     try:
         connection = get_db_connection()
@@ -347,22 +348,23 @@ def verificar_horario_clase(id_clase):
                     hora_inicio = turno["hora_inicio"]
                     hora_fin = turno["hora_fin"]
 
-                    # extraemos la parte de la hora, minutos y segundos
+                    # Asegurarse de que las horas son de tipo time
                     if isinstance(hora_inicio, timedelta):
                         hora_inicio = (datetime.min + hora_inicio).time()
                     if isinstance(hora_fin, timedelta):
                         hora_fin = (datetime.min + hora_fin).time()
 
-                    # Obtener la hora actual como un objeto datetime.time
-                    hora_actual = datetime.now().time()  # (no la fecha)
+                    hora_actual = datetime.now().time()  # hora actual (solo hora, no fecha)
+
+                    print(f"Hora inicio: {hora_inicio}, Hora fin: {hora_fin}, Hora actual: {hora_actual}")
 
                     # Compara la hora actual con el rango de la clase
                     if hora_inicio <= hora_actual <= hora_fin:
                         print(f"La clase está en su horario: {hora_inicio} <= {hora_actual} <= {hora_fin}")
-                        return False
+                        return False  # durante el horario, no se puede modificar
                     else:
                         print(f"La clase NO está en su horario: {hora_inicio} <= {hora_actual} <= {hora_fin}")
-                        return True
+                        return True  # se puede modificar
 
         return False
     except Exception as e:
