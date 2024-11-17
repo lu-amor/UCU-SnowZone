@@ -6,7 +6,6 @@ import EditClassModal from "../../components/class/editClassModal/editClass";
 import NewClassModal from "../../components/class/newClassModal/newClass";
 
 const classesPage = ({classesArray, instructors, shifts, activities, studentsArray, addClass, updateClass, deleteClass}) => {
-    const [classList, setClassList] = useState([]);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [selectedClass, setSelectedClass] = useState(null);
     const [isNewModalOpen, setIsNewModalOpen] = useState(false);
@@ -28,8 +27,6 @@ const classesPage = ({classesArray, instructors, shifts, activities, studentsArr
                             <ClassCard
                             key={clase.id}
                             clase={clase}
-                            deleteClass={deleteClass}
-                            updateClass={updateClass}
                             openEditModal={() => {
                                 setSelectedClass(clase);
                                 setIsEditModalOpen(true);
@@ -54,7 +51,7 @@ const classesPage = ({classesArray, instructors, shifts, activities, studentsArr
                     closeModal={() => setIsNewModalOpen(false)}
                     addClass={addClass}
                     instructors={instructors}
-                    shifts={shifts}
+                    turnos={shifts}
                     studentsArray={studentsArray}
                     activities={activities}
                 />

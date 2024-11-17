@@ -107,13 +107,22 @@ def logout():
 def protected():
     return "Esta es un área protegida."
 
-@app.route('/api/actividades', methods=['GET'])
-def api_actividades():
-    cursor.execute("SELECT * FROM actividades")
-    value = cursor.fetchall()
-    return jsonify(value)
+@app.route("/activities", methods=["GET"])
+def get_activities():
+    try:
+        connection = get_db_connection()
+        cursor = connection.cursor(dictionary=True)
+        cursor.execute("SELECT * FROM actividades")
+        activities = cursor.fetchall()
+        cursor.close()
+        connection.close()
+        return jsonify({"activities": activities})
+    except Exception as e:
+        return (
+            jsonify({"message": str(e)}), 400
+        )
 
-@app.route('/api/add_actividad', methods=['POST'])
+@app.route('/api/actividades', methods=['POST'])
 def api_add_actividad():
     data = request.json
     descripcion = data.get('descripcion')
@@ -128,7 +137,7 @@ def api_add_actividad():
         connection.rollback()
         return jsonify({"error": str(e)}), 500
 
-@app.route('/api/update_actividad/<int:id>', methods=['PATCH'])
+@app.route('/api/actividades/<int:id>', methods=['PATCH'])
 def api_update_actividad(id):
     data = request.json
     fields = []
@@ -155,7 +164,7 @@ def api_update_actividad(id):
         connection.rollback()
         return jsonify({"error": str(e)}), 500
 
-@app.route('/api/delete_actividad/<int:id>', methods=['DELETE'])
+@app.route('/api/actividades/<int:id>', methods=['DELETE'])
 def api_delete_actividad(id):
     try:
         cursor.execute("DELETE FROM actividades WHERE id = %s", (id,))
@@ -170,19 +179,21 @@ def api_delete_actividad(id):
 
 #----------------------------------------- <3 Rutas de Clase :) ---------------------------------------------------
 
-@app.route("/clases", methods =["GET"])
+@app.route("/classes", methods =["GET"])
 def clases():
     try:
         connection = get_db_connection()
         cursor = connection.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM clase")
-        value = cursor.fetchall()
+        cursor.execute("select clase.id, clase.dictada, clase.grupal, a.descripcion, a.costo, i.nombre, i.apellido, t.hora_inicio, t.hora_fin from clase join obligatorio.actividades a on clase.id_actividad = a.id join obligatorio.instructor i on i.ci = clase.ci_instructor join obligatorio.turno t on clase.id_turno = t.id;")
+        classes = cursor.fetchall()
         cursor.close()
         connection.close()
-        return jsonify({"clases": value})
+        return jsonify({"clases": classes})
     except Exception as e:
         cursor.close()
         connection.close()
+        print(e)
+        print(classes)
         return jsonify({"error": str(e)}), 500
 
 @app.route("/get_clase/<int:id>", methods=["GET"])
@@ -219,18 +230,20 @@ def delete_clase(id):
         connection.close()
         return jsonify({"error": str(e)}), 500
 
-@app.route("/add_clase", methods=["POST"])
+@app.route("/classes", methods=["POST"])
 def add_clase():
     data = request.json
-    profesor = request.json.get("ci_instructor")
-    actividad = request.json.get("id_actividad")
-    turno = request.json.get("id_turno")
+    profesor = data.get("ci_instructor")
+    actividad = data.get("id_actividad")
+    turno = data.get("id_turno")
+    dictada = data.get("dictada")
+    grupal = data.get("grupal")
 
     try:
         connection = get_db_connection()
         cursor = connection.cursor(dictionary=True)
-        cursor.execute("INSERT INTO clase (ci_instructor, id_actividad, id_turno) VALUES ( %s, %s, %s)",
-                       ( profesor, actividad, turno))
+        cursor.execute("INSERT INTO clase (ci_instructor, id_actividad, id_turno, dictada, grupal) VALUES ( %s, %s, %s, %s, %s)",
+            ( profesor, actividad, turno, dictada, grupal))
         connection.commit()
         cursor.close()
         connection.close()

@@ -30,8 +30,6 @@ const studentsPage = ({studentsArray, addStudent, updateStudent, deleteStudent})
                             <StudentCard
                                 key={student.ci}
                                 student={student}
-                                deleteStudent={deleteStudent}
-                                updateStudent={updateStudent}
                                 openEditModal={() => {
                                     setSelectedStudent(student);
                                     setIsEditModalOpen(true);
@@ -44,6 +42,7 @@ const studentsPage = ({studentsArray, addStudent, updateStudent, deleteStudent})
             {isEditModalOpen && (
                 <EditStudentModal
                     closeModal={() => setIsEditModalOpen(false)}
+                    deleteStudent={deleteStudent}
                     updateStudent={updateStudent}
                     selectedStudent={selectedStudent}
                 />

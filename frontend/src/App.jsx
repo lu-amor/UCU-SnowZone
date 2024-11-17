@@ -33,9 +33,13 @@ import StudentList from './StudentList'
 
 function App() {
   const [studentsArray, setStudentsArray] = useState([]);
+  const [activitiesArray, setActivitiesArray] = useState([]);
+  const [classesArray, setClassesArray] = useState([]);
 
   useEffect(() => {
     fetchStudents()
+    fetchActivities()
+    // fetchClasses()
   }, []);
 
   const fetchStudents = async () => {
@@ -74,17 +78,66 @@ function App() {
     setStudentsArray([...studentsArray, student]);
   };
 
-  const classesArray = [
-    {id: 1, activity: "Actividad 1", from: "09:00", to: "11:00", instructor: 'instructor 1', taught: false, grupal: true, students: ['student 1', 'student 2']},
-    {id: 2, activity: "Actividad 2", from: "13:00", to: "15:00", instructor: 'instructor 2', taught: true, grupal: true, students: ['student 1', 'student 2']},
-    {id: 3, activity: "Actividad 3", from: "15:00", to: "17:00", instructor: 'instructor 3', taught: false, grupal: false, students: ['student 1']},
-  ];
+  async function deleteStudentAW( student ) {
+    console.log("Deleting student: ", student);
+    try {
+      await fetch(`http://127.0.0.1:5000/students/${ student.ci }`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+    } catch (error) {
+      console.error("Error deleting data: ", error);
+    }
+  }
 
-  const activitiesArray = [
-    {id: 1, name: "Actividad 1", cost: 25},
-    {id: 2, name: "Actividad 2", cost: 50},
-    {id: 3, name: "Actividad 3", cost: 100},
-  ];
+  const deleteStudent = (student) => {
+    deleteStudentAW( student ).then(() => {
+      setStudentsArray([
+      ...studentsArray.filter((currentStudent) => currentStudent.ci !== student.ci),
+    ])});
+  };
+
+  const fetchActivities = async () => {
+    const response = await fetch("http://127.0.0.1:5000/activities")
+    const data = await response.json()
+    setActivitiesArray(data.activities)
+  };
+
+/*   const fetchClasses = async () => {
+    const response = await fetch("http://127.0.0.1:5000/classes")
+    const data = await response.json()
+    setClassesArray(data.classes)
+  }; */
+
+  async function postClassAW ( newClass ) {
+    try {
+      const response = await fetch("http://127.0.0.1:5000/classes", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify( newClass ),
+      });
+
+      const newPostedClass = await response.json();
+      return newPostedClass; 
+    } catch (error) {
+      console.log("Error posting data: ", error);
+    }
+  }
+
+  const addClass = async (profesor, actividad, turno ) => {
+    const newClass = {
+      profesor: profesor,
+      actividad: actividad,
+      turno: turno
+    };
+    const clase = await postClassAW(newClass);
+    setClassesArray([...classesArray, clase]);
+  };
+
 
   const instructorsArray = [  
     {id: 1, name: "Instructor 1", surname: 'Surname 1', birthdate: '21-05-2004', phone: '111222333', email: 'instructor1@mail.com'},
@@ -137,7 +190,7 @@ function App() {
         <Route path="/homeTeacher" element={<HomeTeacher />}></Route>
         <Route path="/homeStudent" element={<HomeStudent />}></Route>
 
-        <Route path="/classes" element={<ClassesPage classesArray={classesArray} instructors={instructorsArray} shifts={shiftsArray} students={studentsArray} activities={activitiesArray}/>}></Route>
+        <Route path="/classes" element={<ClassesPage classesArray={classesArray} activities={activitiesArray} instructors={instructorsArray} shifts={shiftsArray} students={studentsArray} addClass={addClass}/>}></Route>
         <Route path="/classesT" element={<ClassesPageTeacher classesArray={classesArray} instructors={instructorsArray} shifts={shiftsArray} students={studentsArray}/>}></Route>
         <Route path="/classesS" element={<ClassesPageStudents classesArray={classesArray}/>}></Route>
 
@@ -145,7 +198,7 @@ function App() {
         <Route path="/activitiesT" element={<ActivitiesPageT activitiesArray={activitiesArray}/>}></Route>
         <Route path="/activitiesS" element={<ActivitiesPageS activitiesArray={activitiesArray}/>}></Route>
 
-        <Route path="/students" element={<StudentsPage studentsArray={studentsArray} addStudent={addStudent}/>}></Route>
+        <Route path="/students" element={<StudentsPage studentsArray={studentsArray} addStudent={addStudent} deleteStudent={deleteStudent}/>}></Route>
         <Route path="/studentsT" element={<StudentsPageT studentsArray={studentsArray}/>}></Route>
         <Route path="/studentsS" element={<StudentsPageS studentsArray={studentsArray}/>}></Route>
 

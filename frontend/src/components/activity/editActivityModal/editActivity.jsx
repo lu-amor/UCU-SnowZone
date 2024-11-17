@@ -2,18 +2,18 @@ import React, { useState, useEffect } from 'react';
 import Icon from '@mdi/react';
 import { mdiDelete } from '@mdi/js'
 
-const EditActivityModal = ({ selectedActivity, costs, closeModal, updateActivity, deleteActivity }) => {
-    const [cost, setCost] = useState(0);
+const EditActivityModal = ({ selectedActivity, closeModal, updateActivity, deleteActivity }) => {
+    const [costo, setCosto] = useState(0);
 
     useEffect(() => {
         if (selectedActivity) {
-            setCost(selectedActivity.cost);
+            setCosto(selectedActivity.costo);
         }
     }, [selectedActivity]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const updatedActivity = { ...selectedActivity, cost};
+        const updatedActivity = { ...selectedActivity, costo};
         await updateActivity(updatedActivity);
         closeModal();
     };
@@ -32,9 +32,9 @@ const EditActivityModal = ({ selectedActivity, costs, closeModal, updateActivity
                             <label className="label">{selectedActivity.activity}</label>
                         </div>
                         <div className="field">
-                            <label className="label">Cost: {selectedActivity.cost}</label>
+                            <label className="label">Costo: {selectedActivity.costo}</label>
                             <div className="control">
-                                <input type="number" className="input is-success" value={cost} onChange={(e) => setCost(e.target.value)} />
+                                <input type="number" className="input is-success" value={costo} onChange={(e) => setCosto(e.target.value)} />
                             </div>
                         </div>
                         <div className="field">

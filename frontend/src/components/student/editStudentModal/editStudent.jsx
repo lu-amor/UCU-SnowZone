@@ -20,6 +20,11 @@ const EditStudentModal = ({ selectedStudent, closeModal, updateStudent, deleteSt
         closeModal();
     };
 
+    const handleDelete = () => {
+        deleteStudent(selectedStudent);
+        closeModal();
+    }
+
     return (
         <div className="modal is-active">
             <div className="modal-background" onClick={closeModal}></div>
@@ -51,7 +56,7 @@ const EditStudentModal = ({ selectedStudent, closeModal, updateStudent, deleteSt
                                 type="button" 
                                 className={`button is-primary is-justify-self-flex-end`} 
                                 onClick={() => {
-                                    deleteStudent();
+                                    handleDelete();
                                     closeModal();
                                 }}
                                 > <Icon path={mdiDelete} size={1.5} color='#ffffff' />

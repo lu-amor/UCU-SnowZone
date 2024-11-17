@@ -1,44 +1,17 @@
 import React, { useState, useEffect } from 'react';
 
-const NewClassModal = ({ instructors, activities, shifts, studentsArray, closeModal, updateClass }) => {
+const NewClassModal = ({ instructors, activities, turnos, closeModal }) => {
     const [instructor, setInstructor] = useState('');
-    const [shift, setShift] = useState('');
-    const [students, setStudents] = useState([]);
-    const [activity, setActivity] = useState('');
-    const [searchTerm, setSearchTerm] = useState('');
-    const [filteredStudents, setFilteredStudents] = useState([]);
-    const [activeTab, setActiveTab] = useState('todos');
-    const [activityType, setActivityType] = useState('Grupal');
-
-    useEffect(() => {
-        const filtered = (studentsArray || []).filter(student => {
-            const studentName = student.name.toLowerCase();
-            const studentSurname = student.surname.toLowerCase();
-            const lowerCaseSearchTerm = searchTerm.toLowerCase();
-
-            return (
-                studentName.includes(lowerCaseSearchTerm) || 
-                studentSurname.includes(lowerCaseSearchTerm)
-            );
-        });
-        setFilteredStudents(filtered);
-    }, [searchTerm, studentsArray]);
+    const [turno, setTurno] = useState('');
+    const [actividad, setActividad] = useState('');
+    const [grupal, setGrupal] = useState(true);
+    const dictada = false;
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const newClass = { activity, instructor, shift, students };
+        const newClass = { actividad, instructor, turno, dictada, grupal: grupal ? 1 : 0 };
         await newClass(newClass);
         closeModal();
-    };
-
-    const addStudent = (student) => {
-        if (!students.some(s => s.id === student.id)) {
-            setStudents([...students, student]);
-        }
-    };
-
-    const removeStudent = (studentId) => {
-        setStudents(students.filter(s => s.id !== studentId));
     };
 
     return (
@@ -63,26 +36,26 @@ const NewClassModal = ({ instructors, activities, shifts, studentsArray, closeMo
                                 </div>
                             </div>
                             <div className="field">
-                                <label className="label">Activity</label>
+                                <label className="label">Actividad</label>
                                 <div className="control">
                                     <div className="select">
-                                        <select value={activity} onChange={(e) => setActivity(e.target.value)}>
-                                            <option value="" disabled>Select an activity</option>
-                                            {activities.map((activity) => (
-                                                <option key={activity.id} value={activity.id}>{activity.name}</option>
+                                        <select value={actividad} onChange={(e) => setActividad(e.target.value)}>
+                                            <option value="" disabled>Seleccionar actividad</option>
+                                            {activities.map((actividad) => (
+                                                <option key={actividad.id} value={actividad.id}>{actividad.descripcion}</option>
                                             ))}
                                         </select>
                                     </div>
                                 </div>
                             </div>
                             <div className="field">
-                                <label className="label">Shift</label>
+                                <label className="label">Turno</label>
                                 <div className="control">
                                     <div className="select">
-                                        <select value={shift} onChange={(e) => setShift(e.target.value)}>
-                                            <option value="" disabled>Select a shift</option>
-                                            {shifts.map((shift) => (
-                                                <option key={shift.id} value={shift.id}>{shift.from} - {shift.to}</option>
+                                        <select value={turno} onChange={(e) => setTurno(e.target.value)}>
+                                            <option value="" disabled>Seleccionar turno</option>
+                                            {turnos.map((turno) => (
+                                                <option key={turno.id} value={turno.id}>{turno.from} - {turno.to}</option>
                                             ))}
                                         </select>
                                     </div>
@@ -94,10 +67,10 @@ const NewClassModal = ({ instructors, activities, shifts, studentsArray, closeMo
                                 Group
                                 <input
                                     type="radio"
-                                    name="activityType"
-                                    value="Grupal"
-                                    checked={activityType === 'Grupal'}
-                                    onChange={(e) => setActivityType(e.target.value)}
+                                    name="grupal"
+                                    value={true}
+                                    checked={grupal === true}
+                                    onChange={() => setGrupal(true)}
                                     style={{ marginLeft: '5px' }}
                                 />
                             </label>
@@ -105,77 +78,13 @@ const NewClassModal = ({ instructors, activities, shifts, studentsArray, closeMo
                                 Individual
                                 <input
                                     type="radio"
-                                    name="activityType"
-                                    value="Individual"
-                                    checked={activityType === 'Individual'}
-                                    onChange={(e) => setActivityType(e.target.value)}
+                                    name="grupal"
+                                    value={false}
+                                    checked={grupal === false}
+                                    onChange={() => setGrupal(false)}
                                     style={{ marginLeft: '5px' }}
                                 />
                             </label>
-                        </div>
-
-                        <div className="field">
-                            <label className="label">Search students</label>
-                            <div className="control">
-                                <input
-                                    className="input"
-                                    type="text"
-                                    placeholder="Student name or surname"
-                                    value={searchTerm}
-                                    onChange={(e) => setSearchTerm(e.target.value)}
-                                />
-                            </div>
-                        </div>
-
-                        <div className="tabs is-boxed is-right">
-                            <ul>
-                                <li className={activeTab === 'todos' ? 'is-active' : ''} onClick={() => setActiveTab('todos')}>
-                                    <a>All</a>
-                                </li>
-                                <li className={activeTab === 'inscriptos' ? 'is-active' : ''} onClick={() => setActiveTab('inscriptos')}>
-                                    <a>Enrolled</a>
-                                </li>
-                            </ul>
-                        </div>
-
-                        <div className="field">
-                            {activeTab === 'todos' && filteredStudents.length > 0 && (
-                                <div className="box">
-                                    <p className="subtitle is-6">Alumnos disponibles</p>
-                                    {filteredStudents.map((student) => (
-                                        <div key={student.id} className="field is-grouped is-grouped-multiline">
-                                            <p>{student.name}</p>
-                                            <button
-                                                type="button"
-                                                className="button is-small is-primary"
-                                                onClick={() => addStudent(student)}
-                                                style={{marginLeft: 'auto'}}
-                                            >
-                                                Agregar
-                                            </button>
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
-
-                            {activeTab === 'inscriptos' && students.length > 0 && (
-                                <div className="box">
-                                    <p className="subtitle is-6">Alumnos inscriptos</p>
-                                    {studentsArray.map((student) => (
-                                        <div key={student.id} className="field is-grouped is-grouped-multiline">
-                                            <p>{student.name}</p>
-                                            <button
-                                                type="button"
-                                                className="button is-small is-danger"
-                                                onClick={() => removeStudent(student.id)}
-                                                style={{marginLeft: 'auto'}}
-                                            >
-                                                Eliminar
-                                            </button>
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
                         </div>
 
                         <div className={`field is-grouped is-justify-content-flex-end`}>

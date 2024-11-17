@@ -6,7 +6,6 @@ import EditActivityModal from "../../components/activity/editActivityModal/editA
 import NewActivityModal from "../../components/activity/newActivityModal/newActivity";
 
 const activitiesPage = ({activitiesArray, addActivity, updateActivity, deleteActivity}) => {
-    const [activityList, setActivityList] = useState([]);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [selectedActivity, setSelectedActivity] = useState(null);
     const [isNewModalOpen, setIsNewModalOpen] = useState(false);
@@ -28,8 +27,6 @@ const activitiesPage = ({activitiesArray, addActivity, updateActivity, deleteAct
                             <ActivityCard
                             key={activity.id}
                             activity={activity}
-                            deleteActivity={deleteActivity}
-                            updateActivity={updateActivity}
                             openEditModal={() => {
                                 setSelectedActivity(activity);
                                 setIsEditModalOpen(true);
