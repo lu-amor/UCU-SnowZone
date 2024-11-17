@@ -20,6 +20,8 @@ class User(UserMixin):
 def load_user(user_id):
     return User(user_id)
 
+# GET LOGIN
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -38,6 +40,7 @@ def login():
 
     return render_template('login.html')
 
+#GET STUDENTS
 @app.route("/students", methods=["GET"])
 def get_contacts():
     try:
@@ -54,6 +57,7 @@ def get_contacts():
             jsonify({"message": str(e)}), 400
         )
 
+#CREATE STUDENT
 @app.route("/create_student", methods=["POST"])
 def create_student():
     cedula = request.json.get("ci")
@@ -88,9 +92,6 @@ def create_student():
 
     return jsonify({"message": "Alumno creado correctamente"}), 201
 
-#patch & delete
-#con instructores, shifts, actividades, clases, equipamiento, alumno-clase
-#pensar selects de reportes
 
 @app.route('/logout')
 @login_required
@@ -103,12 +104,14 @@ def logout():
 def protected():
     return "Esta es un área protegida."
 
+#GET ACTIVIDADES
 @app.route('/api/actividades', methods=['GET'])
 def api_actividades():
     cursor.execute("SELECT * FROM actividades")
     value = cursor.fetchall()
     return jsonify(value)
 
+#ADD ACTIVIDADES
 @app.route('/api/add_actividad', methods=['POST'])
 def api_add_actividad():
     data = request.json
@@ -124,6 +127,7 @@ def api_add_actividad():
         connection.rollback()
         return jsonify({"error": str(e)}), 500
 
+#UPDATE ACTIVIDADES
 @app.route('/api/update_actividad/<int:id>', methods=['PATCH'])
 def api_update_actividad(id):
     data = request.json
@@ -151,6 +155,7 @@ def api_update_actividad(id):
         connection.rollback()
         return jsonify({"error": str(e)}), 500
 
+#DELETE ACTIVIDADES
 @app.route('/api/delete_actividad/<int:id>', methods=['DELETE'])
 def api_delete_actividad(id):
     try:
@@ -161,11 +166,11 @@ def api_delete_actividad(id):
         connection.rollback()
         return jsonify({"error": str(e)}), 500
 
-# if __name__ == '__main__':
-#     app.run(debug=True)
+
 
 #----------------------------------------- <3 Rutas de Clase :) ---------------------------------------------------
 
+#GET CLASE
 @app.route("/clases", methods =["GET"])
 def clases():
     try:
@@ -198,7 +203,8 @@ def get_clase(id):
         cursor.close()
         connection.close()
         return jsonify({"error": str(e)}), 500
-
+    
+#DELETE CLASE
 @app.route("/delete_clase/<int:id>", methods=["DELETE"])
 def delete_clase(id):
     try:
@@ -215,35 +221,54 @@ def delete_clase(id):
         connection.close()
         return jsonify({"error": str(e)}), 500
 
+#ADD CLASE
 @app.route("/add_clase", methods=["POST"])
 def add_clase():
     data = request.json
-    profesor = request.json.get("ci_instructor")
-    actividad = request.json.get("id_actividad")
-    turno = request.json.get("id_turno")
+    profesor = data.get("ci_instructor")
+    actividad = data.get("id_actividad")
+    turno = data.get("id_turno")
 
     try:
         connection = get_db_connection()
-        cursor = connection.cursor(dictionary=True)
-        cursor.execute("INSERT INTO clase (ci_instructor, id_actividad, id_turno) VALUES ( %s, %s, %s)",
-                       ( profesor, actividad, turno))
+        cursor = connection.cursor(dictionary=True, buffered=True)
+
+        # Verificar si el instructor ya tiene una clase en el mismo turno
+        cursor.execute(
+            "SELECT * FROM clase WHERE ci_instructor = %s AND id_turno = %s",
+            (profesor, turno)
+        )
+        existing_class = cursor.fetchone()
+
+        if existing_class:
+            cursor.close()
+            connection.close()
+            return jsonify({"error": "El instructor ya tiene una clase asignada en este turno"}), 400
+
+        cursor.execute(
+            "INSERT INTO clase (ci_instructor, id_actividad, id_turno) VALUES (%s, %s, %s)",
+            (profesor, actividad, turno)
+        )
         connection.commit()
+
         cursor.close()
         connection.close()
         return jsonify({"message": "Clase agregada correctamente"}), 201
     except Exception as e:
         connection.rollback()
-        cursor.close()
+        if 'cursor' in locals() and cursor:
+            cursor.close()
         connection.close()
         return jsonify({"error": str(e)}), 500
 
+
+#UPDATE CLASE
 @app.route("/update_clase/<int:id>", methods=["PATCH"])
 def update_clase(id):
     data = request.json
     fields = []
     values = []
 
-    
     if "ci_instructor" in data:
         fields.append("ci_instructor = %s")
         values.append(data["ci_instructor"])
@@ -251,28 +276,41 @@ def update_clase(id):
         fields.append("id_actividad = %s")
         values.append(data["id_actividad"])
     if "id_turno" in data:
-        fields.append("Id_turno = %s")
+        fields.append("id_turno = %s")
         values.append(data["id_turno"])
 
     if not fields:
-        cursor.close()
-        connection.close()
         return jsonify({"error": "No se proporcionaron campos para actualizar"}), 400
 
     values.append(id)
-    
+
     try:
-        query = f"UPDATE clase SET {', '.join(fields)} WHERE id = %s"
         connection = get_db_connection()
-        cursor = connection.cursor(dictionary=True)
-        cursor.execute(query, tuple(values))
-        connection.commit()
+        with connection.cursor(dictionary=True, buffered=True) as cursor:
+            # Validar si el instructor ya tiene una clase en el mismo turno
+            if "ci_instructor" in data and "id_turno" in data:
+                cursor.execute(
+                    "SELECT * FROM clase WHERE ci_instructor = %s AND id_turno = %s AND id != %s",
+                    (data["ci_instructor"], data["id_turno"], id)
+                )
+                existing_class = cursor.fetchone()
+                if existing_class:
+                    return jsonify({"error": "El instructor ya tiene una clase asignada en este turno"}), 400
+
+            # Actualizar la clase
+            query = f"UPDATE clase SET {', '.join(fields)} WHERE id = %s"
+            cursor.execute(query, tuple(values))
+            connection.commit()
+
+        connection.close()
         return jsonify({"message": "Clase actualizada correctamente"}), 200
     except Exception as e:
-        connection.rollback()
-        cursor.close()
-        connection.close()
+        if connection:
+            connection.rollback()
+            connection.close()
         return jsonify({"error": str(e)}), 500
+
+
 
 # --------------------------------- <3Rutas de Equipamiento :) ---------------------------------
 
@@ -284,6 +322,7 @@ def equipamiento():
     value = cursor.fetchall()
     return jsonify({"equipamiento": value}), 201
 
+#ADD EQUIPAMIENTO
 @app.route("/add_equipamiento", methods=["POST"])
 def add_equipamiento():
     data = request.json
@@ -311,6 +350,7 @@ def add_equipamiento():
         connection.close()
         return jsonify({"error": str(e)}), 500
 
+#UPDATE EQUIPAMIENTO
 @app.route("/update_equipamiento/<int:id>", methods=["PATCH"])
 def update_equipamiento(id):
     data = request.json
@@ -355,6 +395,7 @@ def update_equipamiento(id):
         connection.close()
         return jsonify({"error": str(e)}), 500
 
+#GET EQUIPAMIENTO
 @app.route("/get_equipamiento/<int:id>", methods=["GET"])
 def get_equipamiento(id):
     try:
@@ -375,6 +416,7 @@ def get_equipamiento(id):
         connection.close()
         return jsonify({"error": str(e)}), 500
 
+#DELETE EQUIPAMIENTO
 @app.route("/delete_equipamiento/<int:id>", methods=["DELETE"])
 def delete_equipamiento(id):
     try:
@@ -402,6 +444,7 @@ def inscripcion():
     value = cursor.fetchall()
     return jsonify({"inscripcion": value}), 201
 
+#GET INSCRIPCION
 @app.route("/get_inscripcion/<int:id_clase>/<int:id_alumno>", methods=["GET"])
 def get_inscripcion(id_clase, id_alumno):
     try:
@@ -422,17 +465,34 @@ def get_inscripcion(id_clase, id_alumno):
         connection.close()
         return jsonify({"error": str(e)}), 500
 
+#ADD INSCRIPCION
 @app.route("/add_inscripcion", methods=["POST"])
 def add_inscripcion():
     data = request.json
-    id_clase = request.json.get("id_clase")
-    id_alumno = request.json.get("id_alumno")
-    id_kit = request.json.get("id_kit")
+    id_clase = data.get("id_clase")
+    id_alumno = data.get("id_alumno")
+    id_kit = data.get("id_kit")
     costo_total = 0
 
     try:
         connection = get_db_connection()
         cursor = connection.cursor(dictionary=True)
+
+        # Verificar si el alumno ya está inscrito en una clase del mismo turno
+        cursor.execute(
+            """
+            SELECT c.id_turno 
+            FROM obligatorio.alumno_clase ac
+            JOIN obligatorio.clase c ON ac.id_clase = c.id
+            WHERE ac.id_alumno = %s AND c.id_turno = (
+                SELECT id_turno FROM obligatorio.clase WHERE id = %s
+            )
+            """, 
+            (id_alumno, id_clase)
+        )
+        existing_inscription = cursor.fetchone()
+        if existing_inscription:
+            raise Exception("El alumno ya está inscrito en otra clase en este turno")
 
         # Obtener costo de la clase/actividad
         cursor.execute("SELECT costo FROM obligatorio.actividades WHERE id = %s", (id_clase,))
@@ -441,7 +501,7 @@ def add_inscripcion():
             raise Exception("Clase no encontrada")
         costo_total += actividad["costo"]
 
-        # Si hay un kit, obtener su costo y sumarlo
+        # Si hay un kit, obtener su costo y restar disponibilidad
         if id_kit:
             cursor.execute("SELECT costo FROM obligatorio.equipamiento_kit WHERE id = %s", (id_kit,))
             kit = cursor.fetchone()
@@ -449,7 +509,6 @@ def add_inscripcion():
                 raise Exception("Kit no encontrado")
             costo_total += kit["costo"]
 
-            # Descontar el kit de la cantidad disponible
             cursor.execute(
                 "UPDATE obligatorio.equipamiento_kit SET cant_disponibles = cant_disponibles - 1 WHERE id = %s",
                 (id_kit,)
@@ -468,11 +527,14 @@ def add_inscripcion():
         return jsonify({"message": "Inscripción realizada correctamente", "costo_total": costo_total}), 201
 
     except Exception as e:
-        connection.rollback()
+        if connection:
+            connection.rollback()
         cursor.close()
         connection.close()
         return jsonify({"error": str(e)}), 500
 
+
+#DELETE INSCRIPCION
 @app.route("/delete_inscripcion/<int:id_clase>/<int:id_alumno>", methods=["DELETE"])
 def delete_inscripcion(id_clase,id_alumno):
 
@@ -519,7 +581,7 @@ def delete_inscripcion(id_clase,id_alumno):
         connection.close()
         return jsonify({"error": str(e)}), 500
 
-
+#UPDATE INSCRIPCION
 @app.route("/update_inscripcion/<int:id_clase>/<int:id_alumno>", methods=["PATCH"])
 def update_inscripcion(id_clase, id_alumno):
     data = request.json
@@ -550,13 +612,10 @@ def update_inscripcion(id_clase, id_alumno):
             print(f"Inscripción no encontrada para id_clase: {id_clase}, id_alumno: {id_alumno}")
             return jsonify({"error": "Inscripción no encontrada"}), 404
 
-        # Usar el id_clase existente, para tener consistencia e integridad de datos
+        # Consistencia e integridad de datos (id_clase y id_alumno no se modifcian)
         id_clase_actual = inscripcion['id_clase']
         id_kit_actual = data.get('id_kit', inscripcion['id_kit'])
 
-        # Imprimir valores para depuración
-        print(f"id_clase_actual: {id_clase_actual}")
-        print(f"id_kit_actual: {id_kit_actual}")
 
         # Obtener el costo de la clase asociada al id_clase_actual
         cursor.execute("SELECT id_actividad FROM obligatorio.clase WHERE id = %s", (id_clase_actual,))
