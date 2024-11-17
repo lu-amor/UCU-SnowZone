@@ -3,19 +3,19 @@ import Icon from '@mdi/react';
 import { mdiDelete } from '@mdi/js'
 
 const EditStudentModal = ({ selectedStudent, closeModal, updateStudent, deleteStudent }) => {
-    const [phone, setPhone] = useState('');
-    const [email, setEmail] = useState('');
+    const [tel, setTel] = useState('');
+    const [mail, setMail] = useState('');
 
     useEffect(() => {
         if (selectedStudent) {
-            setPhone(selectedStudent.phone);
-            setEmail(selectedStudent.email);
+            setTel(selectedStudent.tel);
+            setMail(selectedStudent.mail);
         }
     }, [selectedStudent]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const updatedStudent = { ...selectedStudent, phone, email};
+        const updatedStudent = { ...selectedStudent, tel, mail};
         await updateStudent(updatedStudent);
         closeModal();
     };
@@ -28,22 +28,22 @@ const EditStudentModal = ({ selectedStudent, closeModal, updateStudent, deleteSt
                     <p className="subtitle is-4 has-text-weight-bold">Edit student</p>
                     <form onSubmit={handleSubmit}>
                         <div className="field">
-                            <label className="label">{selectedStudent.name} {selectedStudent.surname}</label>
+                            <label className="label">{selectedStudent.nombre} {selectedStudent.apellido}</label>
                         </div>
                         <div className="field is-grouped">
-                            <label className="label">CI: {selectedStudent.id}</label>
-                            <label className="label">Birthdate: {selectedStudent.birthdate}</label>
+                            <label className="label">CI: {selectedStudent.ci}</label>
+                            <label className="label">Birthdate: {selectedStudent.f_nac}</label>
                         </div>
                         <div className="field">
-                            <label className="label">Phone: {selectedStudent.phone}</label>
+                            <label className="label">Tel: {selectedStudent.tel}</label>
                             <div className="control">
-                                <input type="tel" className="input is-success" value={phone} onChange={(e) => setPhone(e.target.value)} />
+                                <input type="tel" className="input is-success" value={tel} onChange={(e) => setTel(e.target.value)} />
                             </div>
                         </div>
                         <div className="field">
-                            <label className="label">Email: {selectedStudent.email}</label>
+                            <label className="label">Mail: {selectedStudent.mail}</label>
                             <div className="control">
-                                <input type="email" className="input is-success" value={email} onChange={(e) => setEmail(e.target.value)} />
+                                <input type="mail" className="input is-success" value={mail} onChange={(e) => setMail(e.target.value)} />
                             </div>
                         </div>
                         <div className="field">

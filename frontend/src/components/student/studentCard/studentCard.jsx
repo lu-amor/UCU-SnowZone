@@ -6,11 +6,11 @@ function StudentCard({ openEditModal, student }) {
         <div className={classes.cardContainer}>
             <div className={classes.cardContent} onClick={openEditModal}>
                 <h4 className={`${classes.title}`}>
-                    {student.surname} {student.name}
+                    {student.apellido}, {student.nombre}
                 </h4>
                 <div className={`${classes.dataContainer}`}>
                     <p className={`${classes.data}`} id={classes.student}>
-                        {student.email}
+                        {student.mail}
                     </p>
                 </div>
             </div>

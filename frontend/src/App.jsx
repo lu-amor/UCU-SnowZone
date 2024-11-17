@@ -30,19 +30,20 @@ import ShiftsPageS from './pages/shifts/shiftsPageS'
 
 import ReportsPage from './pages/reports/reportsPage'
 import { Routes, Route, Navigate } from 'react-router-dom'
+import StudentList from './StudentList'
 
 function App() {
-  const [students, setStudents] = useState([])
+  const [studentsArray, setStudentsArray] = useState([]);
 
   useEffect(() => {
     fetchStudents()
-  }, [])
+  }, []);
   const fetchStudents = async () => {
     const response = await fetch("http://127.0.0.1:5000/students")
     const data = await response.json()
-    setStudents(data.students)
-    console.log(data.students)
-  }
+    setStudentsArray(data.students)
+  };
+
   const classesArray = [
     {id: 1, activity: "Actividad 1", from: "09:00", to: "11:00", instructor: 'instructor 1', taught: false, grupal: true, students: ['student 1', 'student 2']},
     {id: 2, activity: "Actividad 2", from: "13:00", to: "15:00", instructor: 'instructor 2', taught: true, grupal: true, students: ['student 1', 'student 2']},
@@ -53,12 +54,6 @@ function App() {
     {id: 1, name: "Actividad 1", cost: 25},
     {id: 2, name: "Actividad 2", cost: 50},
     {id: 3, name: "Actividad 3", cost: 100},
-  ];
-
-  const studentsArray = [
-    {id: 1, name: "Estudiante 1", surname: 'Surname 1', birthdate: '21-05-2004', phone: '111222333', email: 'student1@mail.com'},
-    {id: 2, name: "Estudiante 2", surname: 'Surname 2', birthdate: '22-05-2004', phone: '111222333', email: 'student2@mail.com'},
-    {id: 3, name: "Estudiante 3", surname: 'Surname 3', birthdate: '23-05-2004', phone: '111222333', email: 'student3@mail.com'},
   ];
 
   const instructorsArray = [  
@@ -103,8 +98,8 @@ function App() {
   return (
     <Routes>
       <Route path="/*" element={<Navigate replace to="/login" />} />
-      
-        <Route path="/login" element={<AuthPage />}></Route>
+{/*         <Route path="/hola" element={<StudentList students={students}/>} />
+ */}        <Route path="/login" element={<AuthPage />}></Route>
         <Route path="/forgot-password" element={<ForgotPasswordForm />} />
         <Route path="/reset-password" element={<ResetPasswordForm />} />
 
