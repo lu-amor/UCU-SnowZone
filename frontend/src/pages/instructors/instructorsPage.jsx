@@ -10,6 +10,8 @@ const instructorsPage = ({instructorsArray, addInstructor, updateInstructor, del
     const [selectedInstructor, setSelectedInstructor] = useState(null);
     const [isNewModalOpen, setIsNewModalOpen] = useState(false);
 
+    const sortedInstructorsArray = [...instructorsArray].sort((a, b) => a.apellido.localeCompare(b.apellido));
+
     return (
         <>
             <AuthNavBar navItem="instructors" />
@@ -22,7 +24,7 @@ const instructorsPage = ({instructorsArray, addInstructor, updateInstructor, del
                         onClick={() => setIsNewModalOpen(true)}>Nuevo Instructor</button>
                 </div>
                 <div className={`${classes.cardsContainer}`}>
-                    {instructorsArray.map((instructor) => {
+                    {sortedInstructorsArray.map((instructor) => {
                         return (
                             <InstructorCard
                             key={instructor.ci}

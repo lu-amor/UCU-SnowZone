@@ -6,6 +6,10 @@ const reportsPage = ({ reportsArray }) => {
     const [selectedTabIndex, setSelectedTabIndex] = useState(0);
 
     const renderContent = () => {
+        if (!reportsArray || !Array.isArray(reportsArray) || reportsArray.length < 3) {
+            return <div>Cargando datos...</div>;
+        }
+
         switch (selectedTabIndex) {
             case 0: // Income per activity
                 return (
@@ -50,8 +54,8 @@ const reportsPage = ({ reportsArray }) => {
                     <table className={`table is-fullwidth is-striped`}>
                         <thead>
                             <tr className={`is-info`}>
-                                <th className={`has-text-white`} style={{ fontSize: "1.3rem", paddingLeft: "2rem" }}>Shift</th>
-                                <th className={`has-text-white`} style={{ fontSize: "1.3rem", textAlign: "right", paddingRight: "2rem" }}>No. Classes</th>
+                                <th className={`has-text-white`} style={{ fontSize: "1.3rem", paddingLeft: "2rem" }}>Turno</th>
+                                <th className={`has-text-white`} style={{ fontSize: "1.3rem", textAlign: "right", paddingRight: "2rem" }}>Cant. clases</th>
                             </tr>
                         </thead>
                         <tbody>

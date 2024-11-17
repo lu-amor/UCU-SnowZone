@@ -12,6 +12,8 @@ const studentsPage = ({studentsArray, addStudent, updateStudent, deleteStudent})
     const [selectedStudent, setSelectedStudent] = useState(null);
     const [isNewModalOpen, setIsNewModalOpen] = useState(false);
 
+    const sortedStudentsArray = [...studentsArray].sort((a, b) => a.apellido.localeCompare(b.apellido));
+
     return (
         <>
             <AuthNavBar navItem="students" />
@@ -25,7 +27,7 @@ const studentsPage = ({studentsArray, addStudent, updateStudent, deleteStudent})
                     </button>
                 </div>
                 <div className={`${classes.cardsContainer}`}>
-                    {studentsArray.map((student) => {
+                    {sortedStudentsArray.map((student) => {
                         return (
                             <StudentCard
                                 key={student.ci}

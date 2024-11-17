@@ -29,6 +29,7 @@ import ShiftsPageS from './pages/shifts/shiftsPageS'
 
 import ReportsPage from './pages/reports/reportsPage'
 import { Routes, Route, Navigate } from 'react-router-dom'
+import EquipmentPage from './pages/equipment/equipmentPage'
 
 function App() {
   const [studentsArray, setStudentsArray] = useState([]);
@@ -37,6 +38,31 @@ function App() {
   const [shiftsArray, setShiftsArray] = useState([]);
   const [instructorsArray, setInstructorsArray] = useState([]);
   const [reportsArray, setReportsArray] = useState([]);
+  const [equipmentArray, setEquipmentArray] = useState([]);
+
+useEffect(() => {  setEquipmentArray ([
+    { id: 1, id_actividad: 1, descripcion: 'Kit de Snowboard', tamanio: 'XS', costo: 600, cant_disponibles: 5 },
+    { id: 2, id_actividad: 1, descripcion: 'Kit de Snowboard', tamanio: 'S', costo: 600, cant_disponibles: 5 },
+    { id: 3, id_actividad: 1, descripcion: 'Kit de Snowboard', tamanio: 'M', costo: 600, cant_disponibles: 5 },
+    { id: 4, id_actividad: 1, descripcion: 'Kit de Snowboard', tamanio: 'L', costo: 600, cant_disponibles: 5 },
+    { id: 5, id_actividad: 1, descripcion: 'Kit de Snowboard', tamanio: 'XL', costo: 600, cant_disponibles: 5 },
+    { id: 6, id_actividad: 1, descripcion: 'Kit de Snowboard', tamanio: 'XXL', costo: 600, cant_disponibles: 5 },
+    { id: 7, id_actividad: 1, descripcion: 'Kit de Snowboard', tamanio: 'XXXL', costo: 600, cant_disponibles: 5 },
+    { id: 8, id_actividad: 2, descripcion: 'Kit de Ski', tamanio: 'XS', costo: 500, cant_disponibles: 10 },
+    { id: 9, id_actividad: 2, descripcion: 'Kit de Ski', tamanio: 'S', costo: 500, cant_disponibles: 10 },
+    { id: 10, id_actividad: 2, descripcion: 'Kit de Ski', tamanio: 'M', costo: 500, cant_disponibles: 10 },
+    { id: 11, id_actividad: 2, descripcion: 'Kit de Ski', tamanio: 'L', costo: 500, cant_disponibles: 10 },
+    { id: 12, id_actividad: 2, descripcion: 'Kit de Ski', tamanio: 'XL', costo: 500, cant_disponibles: 10 },
+    { id: 13, id_actividad: 2, descripcion: 'Kit de Ski', tamanio: 'XXL', costo: 500, cant_disponibles: 10 },
+    { id: 14, id_actividad: 2, descripcion: 'Kit de Ski', tamanio: 'XXXL', costo: 500, cant_disponibles: 10 },
+    { id: 15, id_actividad: 3, descripcion: 'Kit de Moto de Nieve', tamanio: 'XS', costo: 700, cant_disponibles: 3 },
+    { id: 16, id_actividad: 3, descripcion: 'Kit de Moto de Nieve', tamanio: 'S', costo: 700, cant_disponibles: 3 },
+    { id: 17, id_actividad: 3, descripcion: 'Kit de Moto de Nieve', tamanio: 'M', costo: 700, cant_disponibles: 3 },
+    { id: 18, id_actividad: 3, descripcion: 'Kit de Moto de Nieve', tamanio: 'L', costo: 700, cant_disponibles: 3 },
+    { id: 19, id_actividad: 3, descripcion: 'Kit de Moto de Nieve', tamanio: 'XL', costo: 700, cant_disponibles: 3 },
+    { id: 20, id_actividad: 3, descripcion: 'Kit de Moto de Nieve', tamanio: 'XXL', costo: 700, cant_disponibles: 3 },
+    { id: 21, id_actividad: 3, descripcion: 'Kit de Moto de Nieve', tamanio: 'XXXL', costo: 700, cant_disponibles: 3 }
+  ]); }, []);
 
   useEffect(() => {
     fetchStudents()
@@ -416,7 +442,6 @@ function App() {
   
       const responseReport3 = await fetch("http://127.0.0.1:5000/reports/classesPerShift");
       const dataReport3 = await responseReport3.json();
-      console.log(dataReport3.report);
   
       setReportsArray([dataReport1.report, dataReport2.report, dataReport3.report]);
     } catch (error) {
@@ -457,7 +482,7 @@ function App() {
         <Route path="/shiftsS" element={<ShiftsPageS shiftsArray={shiftsArray}/>}></Route>
 
         <Route path="/reports" element={<ReportsPage reportsArray={reportsArray}/>}></Route>
-
+        <Route path="/equipment" element={<EquipmentPage equipmentArray={equipmentArray} actividades={activitiesArray}/>}></Route>
     </Routes>
   )
 };

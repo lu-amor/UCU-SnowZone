@@ -14,12 +14,12 @@ const activitiesPage = ({activitiesArray, addActivity, updateActivity, deleteAct
         <>
             <AuthNavBar navItem="activities" />
             <div className={`${classes.content}`}>
-                <h1 className={`${classes.header}`}>Activities</h1>
+                <h1 className={`${classes.header}`}>Actividades</h1>
                 <div className={`${classes.buttonContainer}`}>
                     <button
                         id="addActivityButton"
                         className={`button is-primary ${classes.addActivityButton}`}
-                        onClick={() => setIsNewModalOpen(true)}>add Activity</button>
+                        onClick={() => setIsNewModalOpen(true)}>Nueva Actividad</button>
                 </div>
                 <div className={`${classes.cardsContainer}`}>
                     {activitiesArray.map((activity) => {

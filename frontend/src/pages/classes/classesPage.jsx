@@ -14,12 +14,12 @@ const classesPage = ({classesArray, instructors, shifts, activities, studentsArr
         <>
             <AuthNavBar navItem="classes" />
             <div className={`${classes.content}`}>
-                <h1 className={`${classes.header}`}>Classes</h1>
+                <h1 className={`${classes.header}`}>Clases</h1>
                 <div className={`${classes.buttonContainer}`}>
                     <button
                         id="addClassButton"
                         className={`button is-primary ${classes.addClassButton}`}
-                        onClick={() => setIsNewModalOpen(true)}>add Class</button>
+                        onClick={() => setIsNewModalOpen(true)}>Nueva Clase</button>
                 </div>
                 <div className={`${classes.cardsContainer}`}>
                     {classesArray.map((clase) => {

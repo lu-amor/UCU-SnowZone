@@ -6,7 +6,7 @@ function InstructorCard({ openEditModal, instructor }) {
         <div className={classes.cardContainer}>
             <div className={classes.cardContent} onClick={openEditModal}>
                 <h4 className={`${classes.title}`}>
-                    {instructor.apellido} {instructor.nombre}
+                    {instructor.apellido}, {instructor.nombre}
                 </h4>
                 <div className={`${classes.dataContainer}`}>
                     <p className={`${classes.data}`} id={classes.instructor}>
