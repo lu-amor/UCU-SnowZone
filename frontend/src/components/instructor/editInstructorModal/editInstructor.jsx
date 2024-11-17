@@ -3,19 +3,19 @@ import Icon from '@mdi/react';
 import { mdiDelete } from '@mdi/js'
 
 const EditInstructorModal = ({ selectedInstructor, closeModal, updateInstructor, deleteInstructor }) => {
-    const [phone, setPhone] = useState('');
-    const [email, setEmail] = useState('');
+    const [mail, setMail] = useState('');
+    const [tel, setTel] = useState('');
 
     useEffect(() => {
         if (selectedInstructor) {
-            setPhone(selectedInstructor.phone);
-            setEmail(selectedInstructor.email);
+            setMail(selectedInstructor.mail);
+            setTel(selectedInstructor.tel);
         }
     }, [selectedInstructor]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const updatedInstructor = { ...selectedInstructor, phone, email};
+        const updatedInstructor = { ...selectedInstructor, mail, tel};
         await updateInstructor(updatedInstructor);
         closeModal();
     };
@@ -28,22 +28,22 @@ const EditInstructorModal = ({ selectedInstructor, closeModal, updateInstructor,
                     <p className="subtitle is-4 has-text-weight-bold">Edit instructor</p>
                     <form onSubmit={handleSubmit}>
                         <div className="field">
-                            <label className="label">{selectedInstructor.name} {selectedInstructor.surname}</label>
+                            <label className="label">{selectedInstructor.nombre} {selectedInstructor.apellido}</label>
                         </div>
                         <div className="field is-grouped">
-                            <label className="label">CI: {selectedInstructor.id}</label>
-                            <label className="label">Birthdate: {selectedInstructor.birthdate}</label>
+                            <label className="label">Cédula: {selectedInstructor.ci}</label>
+                            <label className="label">F. Nacimiento: {selectedInstructor.f_nac.split('00:00')[0].split(', ')[1]}</label>
                         </div>
                         <div className="field">
-                            <label className="label">Phone: {selectedInstructor.phone}</label>
+                            <label className="label">Tel: {selectedInstructor.tel}</label>
                             <div className="control">
-                                <input type="tel" className="input is-success" value={phone} onChange={(e) => setPhone(e.target.value)} />
+                                <input type="tel" className="input is-success" value={tel} onChange={(e) => setTel(e.target.value)} />
                             </div>
                         </div>
                         <div className="field">
-                            <label className="label">Email: {selectedInstructor.email}</label>
+                            <label className="label">Mail: {selectedInstructor.mail}</label>
                             <div className="control">
-                                <input type="email" className="input is-success" value={email} onChange={(e) => setEmail(e.target.value)} />
+                                <input type="mail" className="input is-success" value={mail} onChange={(e) => setMail(e.target.value)} />
                             </div>
                         </div>
                         <div className="field">
@@ -51,7 +51,7 @@ const EditInstructorModal = ({ selectedInstructor, closeModal, updateInstructor,
                                 type="button" 
                                 className={`button is-primary is-justify-self-flex-end`} 
                                 onClick={() => {
-                                    deleteInstructor();
+                                    deleteInstructor(selectedInstructor);
                                     closeModal();
                                 }}
                                 > <Icon path={mdiDelete} size={1.5} color='#ffffff' />

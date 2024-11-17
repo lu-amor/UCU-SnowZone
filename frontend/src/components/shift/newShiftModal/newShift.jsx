@@ -1,13 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 
 const EditShiftModal = ({ closeModal, addShift }) => {
-    const [from, setFrom] = useState('');
-    const [to, setTo] = useState('');
+    const [hora_inicio, setHoraInicio] = useState('');
+    const [hora_fin, setHoraFin] = useState('');
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const newShift = { from, to };
-        await addShift(newShift);
+        if (hora_fin <= hora_inicio) {
+            alert('La hora de fin debe ser después de la hora de inicio.');
+            return;
+        }
+        await addShift(hora_inicio, hora_fin);
         closeModal();
     };
 
@@ -21,11 +24,11 @@ const EditShiftModal = ({ closeModal, addShift }) => {
                         <div className="field is-grouped">
                             <label className="label">From:</label>
                             <div className="control">
-                                <input type="time" className="input is-success" value={from} onChange={(e) => setFrom(e.target.value)} />
+                                <input type="time" className="input is-success" value={hora_inicio} onChange={(e) => setHoraInicio(e.target.value)} />
                             </div>
                             <label className="label">To:</label>
                             <div className="control">
-                                <input type="time" className="input is-success" value={to} onChange={(e) => setTo(e.target.value)} />
+                                <input type="time" className="input is-success" value={hora_fin} onChange={(e) => setHoraFin(e.target.value)} />
                             </div>
                         </div>
                         <div className={`field is-grouped is-justify-content-flex-end`}>

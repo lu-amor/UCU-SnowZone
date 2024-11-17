@@ -1,13 +1,17 @@
 import React, { useState, useEffect } from 'react';
 
-const EditActivityModal = ({ closeModal, addActivity }) => {
-    const [name, setName] = useState('');
-    const [cost, setCost] = useState(0);
+const NewActivityModal = ({ closeModal, addActivity }) => {
+    const [descripcion, setDescripcion] = useState('');
+    const [costo, setCosto] = useState(0);
+    const [min_edad, setMinEdad] = useState(0);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const newActivity = { name, cost };
-        await addActivity(newActivity);
+        if (descripcion.trim() === '' || costo <= 0 || min_edad < 0 || min_edad > 100) {
+            alert('Valores inválidos');
+            return;
+        }
+        await addActivity(descripcion, costo, min_edad);
         closeModal();
     };
 
@@ -16,26 +20,36 @@ const EditActivityModal = ({ closeModal, addActivity }) => {
             <div className="modal-background" onClick={closeModal}></div>
             <div className="modal-content">
                 <div className="box has-background-warning-light">
-                    <p className="subtitle is-4 has-text-weight-bold">New activity</p>
+                    <p className="subtitle is-4 has-text-weight-bold">Nueva actividad</p>
                     <form onSubmit={handleSubmit}>
-                        <div className="field is-grouped">
-                            <label className="label">Name:</label>
+                        <div className="field">
+                            <label className="label">Nombre:</label>
                             <div className="control">
                                 <input
                                     className="input"
                                     type="text"
-                                    value={name}
-                                    onChange={(e) => setName(e.target.value)}
+                                    value={descripcion}
+                                    onChange={(e) => setDescripcion(e.target.value)}
                                     required
                                 />
                             </div>
-                            <label className="label">Cost:</label>
+                            <label className="label">Costo:</label>
                             <div className="control">
                                 <input
                                     className="input"
                                     type="number"
-                                    value={cost}
-                                    onChange={(e) => setCost(e.target.value)}
+                                    value={costo}
+                                    onChange={(e) => setCosto(e.target.value)}
+                                    required
+                                />
+                            </div>
+                            <label className="label">Min Edad:</label>
+                            <div className="control">
+                                <input
+                                    className="input"
+                                    type="number"
+                                    value={min_edad}
+                                    onChange={(e) => setMinEdad(e.target.value)}
                                     required
                                 />
                             </div>
@@ -55,4 +69,4 @@ const EditActivityModal = ({ closeModal, addActivity }) => {
     );
 };
 
-export default EditActivityModal;
+export default NewActivityModal;

@@ -25,17 +25,17 @@ function ClassCard({ openEditModal, clase }) {
                     </p>
                     <div className={`${classes.time}`}>
                         <p className={`${classes.data}`} id={classes.from}>
-                            {clase.id_shift}
+                            {clase.hora_inicio}
                         </p>
                         <p className={`${classes.data}`}>
                             -
                         </p>
                         <p className={`${classes.data}`} id={classes.to}>
-                            {clase.id_shift}
+                            {clase.hora_fin}
                         </p>
                     </div>
                     <p className={`${classes.data}`} id={classes.instructor}>
-                        {clase.ci_instructor}
+                        {clase.apellido} {clase.nombre}
                     </p>
                 </div>
             </div>

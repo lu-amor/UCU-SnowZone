@@ -1,11 +1,12 @@
 from flask import Flask, render_template, redirect, url_for, request, flash, jsonify
 from flask_login import LoginManager, login_user, logout_user, login_required, UserMixin
+import datetime
 from flask_cors import CORS
 from config import app, get_db_connection
 
 app = Flask(__name__)
-
 CORS(app)
+
 app.secret_key = 'your_secret_key'
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -38,14 +39,25 @@ def login():
 
     return render_template('login.html')
 
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('login'))
+
+@app.route('/protected')
+@login_required
+def protected():
+    return "Esta es un área protegida."
+#------------------------------------------ Rutas de Alumnos :) --------------------------------------------
+
 @app.route("/students", methods=["GET"])
-def get_contacts():
+def get_students():
     try:
         connection = get_db_connection()
         cursor = connection.cursor(dictionary=True)
         cursor.execute("SELECT * FROM alumno")
         students = cursor.fetchall()
-        #json_students = list(map(lambda x: x.to_json(), students))
         cursor.close()
         connection.close()
         return jsonify({"students": students})
@@ -68,44 +80,266 @@ def create_student():
             jsonify({"message": "Completar informacion del estudiante"}),
             400,
         )
-    
     try:
         connection = get_db_connection()
         cursor = connection.cursor()
-
         new_student = """
             INSERT INTO alumno (ci, nombre, apellido, f_nac, mail, tel)
             VALUES (%s, %s, %s, %s, %s, %s)
         """
-        
-        print(ci, nombre, apellido, f_nac, mail, tel)
         cursor.execute(new_student, (ci, nombre, apellido, f_nac, mail, tel))
         connection.commit()
-
         cursor.close()
         connection.close()
-
     except Exception as e:
         print(e)
         return jsonify({"message": str(e)}),400 
-
-
     return jsonify({"message": "Alumno creado correctamente"}), 201
 
-#patch & delete
-#con instructores, shifts, actividades, clases, equipamiento, alumno-clase
-#pensar selects de reportes
+@app.route("/students/<int:id>", methods=["PATCH"])
+def update_student(id):
+    data = request.json
+    fields = []
+    values = []
 
-@app.route('/logout')
-@login_required
-def logout():
-    logout_user()
-    return redirect(url_for('login'))
+    if "mail" in data:
+        fields.append("mail = %s")
+        values.append(data["mail"])
+    if "tel" in data:
+        fields.append("tel = %s")
+        values.append(data["tel"])
 
-@app.route('/protected')
-@login_required
-def protected():
-    return "Esta es un área protegida."
+    if not fields:
+        return jsonify({"error": "No fields provided for update"}), 400
+
+    try:
+        connection = get_db_connection()
+        cursor = connection.cursor()
+        cursor.execute(
+            "UPDATE alumno SET " + ", ".join(fields) + " WHERE ci = %s",
+            values + [id],
+        )
+        connection.commit()
+        cursor.close()
+        connection.close()
+        return jsonify({"message": "Alumno actualizado correctamente"}), 200
+    except Exception as e:
+        connection.rollback()
+        cursor.close()
+        connection.close()
+        return jsonify({"error": str(e)}), 500
+    
+@app.route("/students/<int:id>", methods=["DELETE"])
+def delete_student(id):
+    try:
+        connection = get_db_connection()
+        cursor = connection.cursor()
+        cursor.execute("DELETE FROM alumno WHERE ci = %s", (id,))
+        connection.commit()
+        cursor.close()
+        connection.close()
+        return jsonify({"message": "Alumno eliminado correctamente"}), 200
+    except Exception as e:
+        connection.rollback()
+        cursor.close()
+        connection.close()
+        return jsonify({"error": str(e)}), 500
+
+# ----------------------------------------- Rutas de Instructores :) --------------------------------------------
+
+@app.route("/instructors", methods=["GET"])
+def get_instructors():
+    try:
+        connection = get_db_connection()
+        cursor = connection.cursor(dictionary=True)
+        cursor.execute("SELECT * FROM instructor")
+        instructors = cursor.fetchall()
+        cursor.close()
+        connection.close()
+        return jsonify({"instructors": instructors})
+    except Exception as e:
+        return (
+            jsonify({"message": str(e)}), 400
+        )
+
+@app.route("/instructors", methods=["POST"])
+def create_instructor():
+    ci = request.json.get("ci")
+    nombre = request.json.get("nombre")
+    apellido = request.json.get("apellido")
+    f_nac = request.json.get("f_nac")
+    mail = request.json.get("mail")
+    tel = request.json.get("tel")
+
+    if not ci or not nombre or not apellido or not f_nac or not mail or not tel:
+        return (
+            jsonify({"message": "Completar informacion del instructor"}),
+            400,
+        )
+    try:
+        connection = get_db_connection()
+        cursor = connection.cursor()
+        new_instructor = """
+            INSERT INTO instructor (ci, nombre, apellido, f_nac, mail, tel)
+            VALUES (%s, %s, %s, %s, %s, %s)
+        """
+        cursor.execute(new_instructor, (ci, nombre, apellido, f_nac, mail, tel))
+        connection.commit()
+        cursor.close()
+        connection.close()
+    except Exception as e:
+        print(e)
+        return jsonify({"message": str(e)}),400 
+    return jsonify({"message": "Instructor creado correctamente"}), 201
+
+@app.route("/instructors/<int:id>", methods=["PATCH"])
+def update_instructor(id):
+    data = request.json
+    fields = []
+    values = []
+
+    if "mail" in data:
+        fields.append("mail = %s")
+        values.append(data["mail"])
+    if "tel" in data:
+        fields.append("tel = %s")
+        values.append(data["tel"])
+
+    if not fields:
+        return jsonify({"error": "No fields provided for update"}), 400
+
+    try:
+        connection = get_db_connection()
+        cursor = connection.cursor()
+        cursor.execute(
+            "UPDATE instructor SET " + ", ".join(fields) + " WHERE ci = %s",
+            values + [id],
+        )
+        connection.commit()
+        cursor.close()
+        connection.close()
+        return jsonify({"message": "Instructor actualizado correctamente"}), 200
+    except Exception as e:
+        connection.rollback()
+        cursor.close()
+        connection.close()
+        return jsonify({"error": str(e)}), 500
+    
+@app.route("/instructors/<int:id>", methods=["DELETE"])
+def delete_instructor(id):
+    try:
+        connection = get_db_connection()
+        cursor = connection.cursor()
+        cursor.execute("DELETE FROM instructor WHERE ci = %s", (id,))
+        connection.commit()
+        cursor.close()
+        connection.close()
+        return jsonify({"message": "Instructor eliminado correctamente"}), 200
+    except Exception as e:
+        connection.rollback()
+        cursor.close()
+        connection.close()
+        return jsonify({"error": str(e)}), 500
+# ----------------------------------------- Rutas de Turnos :) --------------------------------------------
+
+@app.route("/shifts", methods=["GET"])
+def get_shifts():
+    try:
+        connection = get_db_connection()
+        cursor = connection.cursor(dictionary=True)
+        cursor.execute("SELECT * FROM turno")
+        shifts = cursor.fetchall()
+        for shift in shifts:
+            for key in ["hora_inicio", "hora_fin"]:
+                if isinstance(shift[key], datetime.timedelta):
+                    total_seconds = shift[key].total_seconds()
+                    hours = int(total_seconds // 3600)
+                    minutes = int((total_seconds % 3600) // 60)
+                    shift[key] = f"{hours:02}:{minutes:02}"
+        cursor.close()
+        connection.close()
+        return jsonify({"shifts": shifts})
+    except Exception as e:
+        return (
+            jsonify({"message": str(e)}), 400
+        )
+
+@app.route("/shifts", methods=["POST"])
+def create_shift():
+    hora_inicio = request.json.get("hora_inicio")
+    hora_fin = request.json.get("hora_fin")    
+
+    if not hora_inicio or not hora_fin:
+        return (
+            jsonify({"message": "Completar informacion del turno"}),
+            400,
+        )
+    try:
+        connection = get_db_connection()
+        cursor = connection.cursor()
+        new_shift = """
+            INSERT INTO turno (hora_inicio, hora_fin)
+            VALUES (%s, %s)
+        """
+        cursor.execute(new_shift, (hora_inicio, hora_fin))
+        connection.commit()
+        cursor.close()
+        connection.close()
+    except Exception as e:
+        print(e)
+        return jsonify({"message": str(e)}),400 
+    return jsonify({"message": "Turno creado correctamente"}), 201
+
+@app.route("/shifts/<int:id>", methods=["PATCH"])
+def update_shift(id):
+    data = request.json
+    fields = []
+    values = []
+
+    if "hora_inicio" in data:
+        fields.append("hora_inicio = %s")
+        values.append(data["hora_inicio"])
+    if "hora_fin" in data:
+        fields.append("hora_fin = %s")
+        values.append(data["hora_fin"])
+
+    if not fields:
+        return jsonify({"error": "No fields provided for update"}), 400
+
+    try:
+        connection = get_db_connection()
+        cursor = connection.cursor()
+        cursor.execute(
+            "UPDATE turno SET " + ", ".join(fields) + " WHERE id = %s",
+            values + [id],
+        )
+        connection.commit()
+        cursor.close()
+        connection.close()
+        return jsonify({"message": "Turno actualizado correctamente"}), 200
+    except Exception as e:
+        connection.rollback()
+        cursor.close()
+        connection.close()
+        return jsonify({"error": str(e)}), 500
+    
+@app.route("/shifts/<int:id>", methods=["DELETE"])
+def delete_shift(id):
+    try:
+        connection = get_db_connection()
+        cursor = connection.cursor()
+        cursor.execute("DELETE FROM turno WHERE id = %s", (id,))
+        connection.commit()
+        cursor.close()
+        connection.close()
+        return jsonify({"message": "Turno eliminado correctamente"}), 200
+    except Exception as e:
+        connection.rollback()
+        cursor.close()
+        connection.close()
+        return jsonify({"error": str(e)}), 500
+
+# ---------------------------------------- Rutas de Actividades :) --------------------------------------------
 
 @app.route("/activities", methods=["GET"])
 def get_activities():
@@ -122,7 +356,7 @@ def get_activities():
             jsonify({"message": str(e)}), 400
         )
 
-@app.route('/api/actividades', methods=['POST'])
+@app.route('/activities', methods=['POST'])
 def api_add_actividad():
     data = request.json
     descripcion = data.get('descripcion')
@@ -130,22 +364,29 @@ def api_add_actividad():
     min_edad = data.get('min_edad')
     
     try:
-        cursor.execute("INSERT INTO actividades (descripcion, costo, min_edad) VALUES (%s, %s, %s)", (descripcion, costo, min_edad))
+        connection = get_db_connection()
+        cursor = connection.cursor()
+        new_activity = """
+            INSERT INTO actividades (descripcion, costo, min_edad)
+            VALUES (%s, %s, %s)
+        """
+        cursor.execute(new_activity, (descripcion, costo, min_edad))
         connection.commit()
+        cursor.close()
+        connection.close()
         return jsonify({"message": "Actividad agregada correctamente"}), 201
     except Exception as e:
         connection.rollback()
+        cursor.close()
+        connection.close()
         return jsonify({"error": str(e)}), 500
 
-@app.route('/api/actividades/<int:id>', methods=['PATCH'])
+@app.route('/activities/<int:id>', methods=['PATCH'])
 def api_update_actividad(id):
     data = request.json
     fields = []
     values = []
 
-    if 'descripcion' in data:
-        fields.append('descripcion = %s')
-        values.append(data['descripcion'])
     if 'costo' in data:
         fields.append('costo = %s')
         values.append(data['costo'])
@@ -157,61 +398,59 @@ def api_update_actividad(id):
         return jsonify({"error": "No fields provided for update"}), 400
 
     try:
+        connection = get_db_connection()
+        cursor = connection.cursor()
         cursor.execute("UPDATE actividades SET " + ', '.join(fields) + " WHERE id = %s", values + [id])
         connection.commit()
+        cursor.close()
+        connection.close()
         return jsonify({"message": "Actividad actualizada correctamente"}), 200
     except Exception as e:
         connection.rollback()
+        cursor.close()
+        connection.close()
         return jsonify({"error": str(e)}), 500
 
-@app.route('/api/actividades/<int:id>', methods=['DELETE'])
+@app.route('/activities/<int:id>', methods=['DELETE'])
 def api_delete_actividad(id):
     try:
+        connection = get_db_connection()
+        cursor = connection.cursor()
         cursor.execute("DELETE FROM actividades WHERE id = %s", (id,))
         connection.commit()
+        cursor.close()
+        connection.close()
         return jsonify({"message": "Actividad eliminada correctamente"}), 200
     except Exception as e:
         connection.rollback()
+        cursor.close()
+        connection.close()
         return jsonify({"error": str(e)}), 500
 
-# if __name__ == '__main__':
-#     app.run(debug=True)
-
-#----------------------------------------- <3 Rutas de Clase :) ---------------------------------------------------
+#----------------------------------------- <3 Rutas de Clases :) ---------------------------------------------------
 
 @app.route("/classes", methods =["GET"])
 def clases():
     try:
         connection = get_db_connection()
         cursor = connection.cursor(dictionary=True)
-        cursor.execute("select clase.id, clase.dictada, clase.grupal, a.descripcion, a.costo, i.nombre, i.apellido, t.hora_inicio, t.hora_fin from clase join obligatorio.actividades a on clase.id_actividad = a.id join obligatorio.instructor i on i.ci = clase.ci_instructor join obligatorio.turno t on clase.id_turno = t.id;")
-        classes = cursor.fetchall()
+        cursor.execute("select clase.id, clase.dictada, clase.grupal, a.descripcion, a.costo, i.nombre, i.apellido, t.hora_inicio, t.hora_fin from clase join obligatorio.actividades a on clase.id_actividad = a.id join obligatorio.instructor i on i.ci = clase.ci_instructor join obligatorio.turno t on clase.id_turno = t.id;")
+        clases = cursor.fetchall()
+        for clase in clases:
+            for key in ["hora_inicio", "hora_fin"]:
+                if isinstance(clase[key], datetime.timedelta):
+                    total_seconds = clase[key].total_seconds()
+                    hours = int(total_seconds // 3600)
+                    minutes = int((total_seconds % 3600) // 60)
+                    clase[key] = f"{hours:02}:{minutes:02}"
         cursor.close()
         connection.close()
-        return jsonify({"clases": classes})
+        return jsonify({"clases": clases})
     except Exception as e:
         cursor.close()
         connection.close()
         print(e)
-        print(classes)
-        return jsonify({"error": str(e)}), 500
-
-@app.route("/get_clase/<int:id>", methods=["GET"])
-def get_clase(id):
-    try:
-        connection = get_db_connection()
-        cursor = connection.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM clase WHERE id = %s", (id,))
-        clase = cursor.fetchone()
-        if clase:
-            return jsonify({"clase": clase}), 200
-        else:
-            cursor.close()
-            connection.close()
-            return jsonify({"error": "Clase no encontrada"}), 404
-    except Exception as e:
-        cursor.close()
-        connection.close()
+        print(clases)
         return jsonify({"error": str(e)}), 500
 
 @app.route("/delete_clase/<int:id>", methods=["DELETE"])
@@ -291,7 +530,7 @@ def update_clase(id):
         connection.close()
         return jsonify({"error": str(e)}), 500
 
-# --------------------------------- <3Rutas de Equipamiento :) ---------------------------------
+# --------------------------------- <3 Rutas de Equipamiento :) ---------------------------------
 
 @app.route("/equipamiento")
 def equipamiento():
@@ -407,6 +646,81 @@ def delete_equipamiento(id):
         cursor.close()
         connection.close()
         return jsonify({"error": str(e)}), 500
+
+# --------------------------------- <3 Rutas de Reportes :) ---------------------------------
+@app.route("/reports/incomePerActivity", methods=["GET"])
+def get_report1():
+    try:
+        connection = get_db_connection()
+        cursor = connection.cursor(dictionary=True)
+        cursor.execute("""
+            SELECT a.descripcion AS actividad, SUM(ac.costo_total) AS ingresosTotales
+            FROM alumno_clase ac
+            JOIN clase c ON c.id = ac.id_clase
+            JOIN actividades a ON a.id = c.id_actividad
+            GROUP BY a.descripcion
+            ORDER BY ingresosTotales DESC;
+        """)
+        report = cursor.fetchall()
+        cursor.close()
+        connection.close()
+        return jsonify({"report": report})
+    except Exception as e:
+        return (
+            jsonify({"message": str(e)}), 400
+        )
+        
+@app.route("/reports/studentsPerActivity", methods=["GET"])
+def get_report2():
+    try:
+        connection = get_db_connection()
+        cursor = connection.cursor(dictionary=True)
+        cursor.execute("""
+            SELECT a.descripcion AS Actividad,
+                COUNT(ac.id_alumno) AS CantidadAlumnos
+            FROM clase c
+            JOIN actividades a ON c.id_actividad = a.id
+            JOIN alumno_clase ac ON c.id = ac.id_clase
+            GROUP BY a.descripcion
+            ORDER BY CantidadAlumnos DESC;
+        """)
+        report = cursor.fetchall()
+        cursor.close()
+        connection.close()
+        return jsonify({"report": report})
+    except Exception as e:
+        return (
+            jsonify({"message": str(e)}), 400
+        )
+        
+@app.route("/reports/classesPerShift", methods=["GET"])
+def get_report3():
+    try:
+        connection = get_db_connection()
+        cursor = connection.cursor(dictionary=True)
+        cursor.execute("""
+            SELECT t.hora_inicio, t.hora_fin,
+                COUNT(c.id) AS ClasesDictadas
+            FROM clase c
+            JOIN turno t ON c.id_turno = t.id
+            GROUP BY t.hora_inicio, t.hora_fin
+            ORDER BY ClasesDictadas DESC;
+        """)
+        report = cursor.fetchall()
+        for shift in report:
+            for key in ["hora_inicio", "hora_fin"]:
+                if isinstance(shift[key], datetime.timedelta):
+                    total_seconds = shift[key].total_seconds()
+                    hours = int(total_seconds // 3600)
+                    minutes = int((total_seconds % 3600) // 60)
+                    shift[key] = f"{hours:02}:{minutes:02}"
+        cursor.close()
+        connection.close()
+        return jsonify({"report": report})
+    except Exception as e:
+        return (
+            jsonify({"message": str(e)}), 400
+        )
 
 if __name__ == "__main__":
     app.run(debug=True)

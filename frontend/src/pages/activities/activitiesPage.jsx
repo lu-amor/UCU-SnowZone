@@ -40,6 +40,7 @@ const activitiesPage = ({activitiesArray, addActivity, updateActivity, deleteAct
                 <EditActivityModal
                     closeModal={() => setIsEditModalOpen(false)}
                     updateActivity={updateActivity}
+                    deleteActivity={deleteActivity}
                     selectedActivity={selectedActivity}
                 />
             )}

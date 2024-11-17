@@ -4,16 +4,18 @@ import { mdiDelete } from '@mdi/js'
 
 const EditActivityModal = ({ selectedActivity, closeModal, updateActivity, deleteActivity }) => {
     const [costo, setCosto] = useState(0);
+    const [min_edad, setMinEdad] = useState(0);
 
     useEffect(() => {
         if (selectedActivity) {
             setCosto(selectedActivity.costo);
+            setMinEdad(selectedActivity.min_edad);
         }
     }, [selectedActivity]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const updatedActivity = { ...selectedActivity, costo};
+        const updatedActivity = { ...selectedActivity, costo, min_edad };
         await updateActivity(updatedActivity);
         closeModal();
     };
@@ -23,18 +25,16 @@ const EditActivityModal = ({ selectedActivity, closeModal, updateActivity, delet
             <div className="modal-background" onClick={closeModal}></div>
             <div className="modal-content">
                 <div className="box has-background-warning-light">
-                    <p className="subtitle is-4 has-text-weight-bold">Edit activity</p>
+                    <p className="subtitle is-4 has-text-weight-bold">Edit activity - {selectedActivity.descripcion}</p>
                     <form onSubmit={handleSubmit}>
                         <div className="field">
-                            <label className="label">{selectedActivity.name}</label>
-                        </div>
-                        <div className="field">
-                            <label className="label">{selectedActivity.activity}</label>
-                        </div>
-                        <div className="field">
-                            <label className="label">Costo: {selectedActivity.costo}</label>
+                            <label className="label">Costo:</label>
                             <div className="control">
                                 <input type="number" className="input is-success" value={costo} onChange={(e) => setCosto(e.target.value)} />
+                            </div>
+                            <label className="label mt-4">Min Edad:</label>
+                            <div className="control">
+                                <input type="number" className="input is-success" value={min_edad} onChange={(e) => setMinEdad(e.target.value)} />
                             </div>
                         </div>
                         <div className="field">
@@ -42,7 +42,7 @@ const EditActivityModal = ({ selectedActivity, closeModal, updateActivity, delet
                                 type="button" 
                                 className={`button is-primary is-justify-self-flex-end`} 
                                 onClick={() => {
-                                    deleteActivity();
+                                    deleteActivity(selectedActivity);
                                     closeModal();
                                 }}
                                 > <Icon path={mdiDelete} size={1.5} color='#ffffff' />

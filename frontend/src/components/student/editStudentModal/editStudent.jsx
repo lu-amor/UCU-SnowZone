@@ -3,19 +3,19 @@ import Icon from '@mdi/react';
 import { mdiDelete } from '@mdi/js'
 
 const EditStudentModal = ({ selectedStudent, closeModal, updateStudent, deleteStudent }) => {
-    const [tel, setTel] = useState('');
     const [mail, setMail] = useState('');
+    const [tel, setTel] = useState('');
 
     useEffect(() => {
         if (selectedStudent) {
-            setTel(selectedStudent.tel);
             setMail(selectedStudent.mail);
+            setTel(selectedStudent.tel);
         }
     }, [selectedStudent]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const updatedStudent = { ...selectedStudent, tel, mail};
+        const updatedStudent = { ...selectedStudent, mail, tel};
         await updateStudent(updatedStudent);
         closeModal();
     };

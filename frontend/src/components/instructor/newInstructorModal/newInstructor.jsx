@@ -1,17 +1,16 @@
 import React, { useState } from 'react';
 
 const NewInstructorModal = ({ closeModal, addInstructor }) => {
-    const [CI, setCI] = useState('');
-    const [name, setName] = useState('');
-    const [surname, setSurname] = useState('');
-    const [birthdate, setBirthdate] = useState('');
-    const [phone, setPhone] = useState('');
-    const [email, setEmail] = useState('');
+    const [ci, setci] = useState('');
+    const [nombre, setNombre] = useState('');
+    const [apellido, setApellido] = useState('');
+    const [f_nac, setFNac] = useState('');
+    const [mail, setMail] = useState('');
+    const [tel, setTel] = useState('');
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const newInstructor = { CI, name, surname, birthdate, phone, email };
-        await addInstructor(newInstructor);
+        await addInstructor(ci, nombre, apellido, f_nac, mail, tel);
         closeModal();
     };
 
@@ -23,67 +22,67 @@ const NewInstructorModal = ({ closeModal, addInstructor }) => {
                     <p className="subtitle is-4 has-text-weight-bold">New Instructor</p>
                     <form onSubmit={handleSubmit}>
                         <div className="field is-grouped">
-                            <label className="label">Name:</label>
+                            <label className="label">Nombre:</label>
                             <div className="control">
                                 <input
                                     className="input"
                                     type="text"
-                                    value={name}
-                                    onChange={(e) => setName(e.target.value)}
+                                    value={nombre}
+                                    onChange={(e) => setNombre(e.target.value)}
                                     required
                                 />
                             </div>
-                            <label className="label">Surname:</label>
+                            <label className="label">Apellido:</label>
                             <div className="control">
                                 <input
                                     className="input"
                                     type="text"
-                                    value={surname}
-                                    onChange={(e) => setSurname(e.target.value)}
+                                    value={apellido}
+                                    onChange={(e) => setApellido(e.target.value)}
                                     required
                                 />
                             </div>
                         </div>
                         <div className="field is-grouped">
-                            <label className="label">Birthdate:</label>
+                            <label className="label">F. Nacimiento:</label>
                             <div className="control">
                                 <input
                                     className="input"
                                     type="date"
-                                    value={birthdate}
-                                    onChange={(e) => setBirthdate(e.target.value)}
+                                    value={f_nac}
+                                    onChange={(e) => setFNac(e.target.value)}
                                 />
                             </div>
-                            <label className="label">Id. number:</label>
+                            <label className="label">Cédula:</label>
                             <div className="control">
                                 <input
                                     className="input"
                                     type="text"
-                                    value={CI}
-                                    onChange={(e) => setCI(e.target.value)}
+                                    value={ci}
+                                    onChange={(e) => setci(e.target.value)}
                                 />
                             </div>
                         </div>
                         <div className="field">
-                            <label className="label">Phone:</label>
+                            <label className="label">Tel:</label>
                             <div className="control">
                                 <input
                                     className="input"
                                     type="tel"
-                                    value={phone}
-                                    onChange={(e) => setPhone(e.target.value)}
+                                    value={tel}
+                                    onChange={(e) => setTel(e.target.value)}
                                     required
                                 />
                             </div>
                         </div>
                         <div className="field">
-                            <label className="label">Email:</label>
+                            <label className="label">Mail:</label>
                             <div className="control">
                                 <input
                                     className="input"
-                                    type="email"
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
+                                    type="mail"
+                                    value={mail}
+                                    onChange={(e) => setMail(e.target.value)}
                                     required
                                 />
                             </div>
