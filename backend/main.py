@@ -390,6 +390,220 @@ def delete_equipamiento(id):
         cursor.close()
         connection.close()
         return jsonify({"error": str(e)}), 500
+    
+
+# --------------------------------- <3Rutas de Inscripcion (alumno_clase) :) ---------------------------------
+
+@app.route("/inscripcion")
+def inscripcion():
+    connection = get_db_connection()
+    cursor = connection.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM alumno_clase")
+    value = cursor.fetchall()
+    return jsonify({"inscripcion": value}), 201
+
+@app.route("/get_inscripcion/<int:id_clase>/<int:id_alumno>", methods=["GET"])
+def get_inscripcion(id_clase, id_alumno):
+    try:
+        connection = get_db_connection()
+        cursor = connection.cursor(dictionary=True)
+        cursor.execute("SELECT * FROM alumno_clase WHERE id_clase = %s AND id_alumno = %s", (id_clase, id_alumno))
+        inscripcion = cursor.fetchone()
+        if inscripcion:
+            cursor.close()
+            connection.close()
+            return jsonify({"inscripcion": inscripcion}), 200
+        else:
+            cursor.close()
+            connection.close()
+            return jsonify({"error": "Inscripción no encontrada"}), 404
+    except Exception as e:
+        cursor.close()
+        connection.close()
+        return jsonify({"error": str(e)}), 500
+
+@app.route("/add_inscripcion", methods=["POST"])
+def add_inscripcion():
+    data = request.json
+    id_clase = request.json.get("id_clase")
+    id_alumno = request.json.get("id_alumno")
+    id_kit = request.json.get("id_kit")
+    costo_total = 0
+
+    try:
+        connection = get_db_connection()
+        cursor = connection.cursor(dictionary=True)
+
+        # Obtener costo de la clase/actividad
+        cursor.execute("SELECT costo FROM obligatorio.actividades WHERE id = %s", (id_clase,))
+        actividad = cursor.fetchone()
+        if not actividad:
+            raise Exception("Clase no encontrada")
+        costo_total += actividad["costo"]
+
+        # Si hay un kit, obtener su costo y sumarlo
+        if id_kit:
+            cursor.execute("SELECT costo FROM obligatorio.equipamiento_kit WHERE id = %s", (id_kit,))
+            kit = cursor.fetchone()
+            if not kit:
+                raise Exception("Kit no encontrado")
+            costo_total += kit["costo"]
+
+            # Descontar el kit de la cantidad disponible
+            cursor.execute(
+                "UPDATE obligatorio.equipamiento_kit SET cant_disponibles = cant_disponibles - 1 WHERE id = %s",
+                (id_kit,)
+            )
+
+        # Insertar inscripción con el costo calculado
+        cursor.execute(
+            "INSERT INTO obligatorio.alumno_clase (id_clase, id_alumno, id_kit, costo_total) "
+            "VALUES (%s, %s, %s, %s)",
+            (id_clase, id_alumno, id_kit, costo_total)
+        )
+
+        connection.commit()
+        cursor.close()
+        connection.close()
+        return jsonify({"message": "Inscripción realizada correctamente", "costo_total": costo_total}), 201
+
+    except Exception as e:
+        connection.rollback()
+        cursor.close()
+        connection.close()
+        return jsonify({"error": str(e)}), 500
+
+@app.route("/delete_inscripcion/<int:id_clase>/<int:id_alumno>", methods=["DELETE"])
+def delete_inscripcion(id_clase,id_alumno):
+
+    try:
+        connection = get_db_connection()
+        cursor = connection.cursor(dictionary=True)
+
+        # Verificar si la inscripción existe
+        cursor.execute(
+            "SELECT id_kit FROM obligatorio.alumno_clase WHERE id_clase = %s AND id_alumno = %s",
+            (id_clase, id_alumno)
+        )
+        inscripcion = cursor.fetchone()
+
+        if not inscripcion:
+            raise Exception("Inscripción no encontrada")
+
+        # Obtener id_kit si existe
+        id_kit = inscripcion['id_kit']
+
+        # Eliminar la inscripción
+        cursor.execute(
+            "DELETE FROM obligatorio.alumno_clase WHERE id_clase = %s AND id_alumno = %s",
+            (id_clase, id_alumno)
+        )
+
+        # Si hay un kit asociado, incrementar la cantidad disponible
+        if id_kit:
+            cursor.execute(
+                "UPDATE obligatorio.equipamiento_kit SET cant_disponibles = cant_disponibles + 1 WHERE id = %s",
+                (id_kit,)
+            )
+
+        connection.commit()
+        cursor.close()
+        connection.close()
+
+        return jsonify({"message": "Inscripción eliminada correctamente"}), 200
+
+
+    except Exception as e:
+        connection.rollback()
+        cursor.close()
+        connection.close()
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/update_inscripcion/<int:id_clase>/<int:id_alumno>", methods=["PATCH"])
+def update_inscripcion(id_clase, id_alumno):
+    data = request.json
+    fields = []
+    values = []
+
+    try:
+        connection = get_db_connection()
+        cursor = connection.cursor(dictionary=True)
+
+        if 'id_kit' in data:
+            fields.append('id_kit = %s')
+            values.append(data['id_kit'])
+
+        if not fields:
+            return jsonify({"error": "No fields provided for update"}), 400
+
+        cursor.execute(
+            "UPDATE alumno_clase SET " + ', '.join(fields) + " WHERE id_clase = %s AND id_alumno = %s",
+            values + [id_clase, id_alumno]
+        )
+
+        # Recuperar los valores actuales de id_clase y id_kit en la bd para el cálculo
+        cursor.execute("SELECT id_clase, id_kit FROM alumno_clase WHERE id_clase = %s AND id_alumno = %s", (id_clase, id_alumno))
+        inscripcion = cursor.fetchone()
+        
+        if not inscripcion:
+            print(f"Inscripción no encontrada para id_clase: {id_clase}, id_alumno: {id_alumno}")
+            return jsonify({"error": "Inscripción no encontrada"}), 404
+
+        # Usar el id_clase existente, para tener consistencia e integridad de datos
+        id_clase_actual = inscripcion['id_clase']
+        id_kit_actual = data.get('id_kit', inscripcion['id_kit'])
+
+        # Imprimir valores para depuración
+        print(f"id_clase_actual: {id_clase_actual}")
+        print(f"id_kit_actual: {id_kit_actual}")
+
+        # Obtener el costo de la clase asociada al id_clase_actual
+        cursor.execute("SELECT id_actividad FROM obligatorio.clase WHERE id = %s", (id_clase_actual,))
+        clase = cursor.fetchone()
+        if not clase:
+            raise Exception("Clase no encontrada")
+        id_actividad = clase['id_actividad']
+
+        cursor.execute("SELECT costo FROM obligatorio.actividades WHERE id = %s", (id_actividad,))
+        actividad = cursor.fetchone()
+        if not actividad:
+            raise Exception("Actividad no encontrada")
+        costo_clase = actividad["costo"]
+
+        # Obtener el costo del kit (si existe)
+        if id_kit_actual:
+            cursor.execute("SELECT costo FROM obligatorio.equipamiento_kit WHERE id = %s", (id_kit_actual,))
+            kit = cursor.fetchone()
+            costo_kit = kit["costo"] if kit else 0
+        else:
+            costo_kit = 0
+
+        print(f"costo_clase: {costo_clase}")
+        print(f"costo_kit: {costo_kit}")
+
+        # Calcula el nuevo costo total, sumando costo_clase y costo_kit
+        costo_total = costo_clase + costo_kit
+
+        print(f"costo_total: {costo_total}")
+
+        cursor.execute(
+            "UPDATE alumno_clase SET costo_total = %s WHERE id_clase = %s AND id_alumno = %s",
+            (costo_total, id_clase_actual, id_alumno)
+        )
+        connection.commit()
+
+        return jsonify({"message": "Inscripción actualizada correctamente"}), 200
+
+    except Exception as e:
+        if connection:
+            connection.rollback()
+        return jsonify({"error": str(e)}), 500
+    finally:
+        if cursor:
+            cursor.close()
+        if connection:
+            connection.close()
 
 if __name__ == "__main__":
     app.run(debug=True)
