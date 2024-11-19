@@ -25,11 +25,11 @@ const classesPage = ({classesArray, instructors, shifts, activities, studentsArr
                     {classesArray.map((clase) => {
                         return (
                             <ClassCard
-                            key={clase.id}
-                            clase={clase}
-                            openEditModal={() => {
-                                setSelectedClass(clase);
-                                setIsEditModalOpen(true);
+                                key={clase.id}
+                                clase={clase}
+                                openEditModal={() => {
+                                    setSelectedClass(clase);
+                                    setIsEditModalOpen(true);
                             }}
                             />
                         );

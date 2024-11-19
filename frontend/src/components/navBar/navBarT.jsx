@@ -43,46 +43,46 @@ function AuthNavBarTS({ navItem }) {
             <button onClick={goClasses} className={classes.underlineButton}>
             {navItem === "classes" ? (
                 <strong className={classes.buttonSelected}>
-                  Classes
+                  Clases
                 </strong>
               ) : (
-                <span>Classes</span>
+                <span>Clases</span>
               )}
             </button>
             <button onClick={goActivities} className={classes.underlineButton}>
               {navItem === "activities" ? (
                 <strong className={classes.buttonSelected}>
-                  Activities
+                  Actividades
                 </strong>
               ) : (
-                <span>Activities</span>
+                <span>Actividades</span>
               )}
             </button>
             <button onClick={goShifts} className={classes.underlineButton}>
               {navItem === "shifts" ? (
                 <strong className={classes.buttonSelected}>
-                  Shifts
+                  Turnos
                 </strong>
               ) : (
-                <span>Shifts</span>
+                <span>Turnos</span>
               )}
             </button>
             <button onClick={goInstructors} className={classes.underlineButton}>
               {navItem === "instructors" ? (
                 <strong className={classes.buttonSelected}>
-                  Instructors
+                  Instructores
                 </strong>
               ) : (
-                <span>Instructors</span>
+                <span>Instructores</span>
               )}
             </button>
             <button onClick={goStudents} className={classes.underlineButton}>
               {navItem === "students" ? (
                 <strong className={classes.buttonSelected}>
-                  Students
+                  Alumnos
                 </strong>
               ) : (
-                <span>Students</span>
+                <span>Alumnos</span>
               )}
             </button>
           </div>
@@ -91,11 +91,11 @@ function AuthNavBarTS({ navItem }) {
           <Icon path={mdiMenu} size={1.5} className={classes.menuIcon} onClick={toggleDropdown} />
           {showDropdown && (
             <div className={classes.dropdownMenu}>
-              <button onClick={goClasses}>Classes</button>
-              <button onClick={goActivities}>Activities</button>
-              <button onClick={goShifts}>Shifts</button>
-              <button onClick={goInstructors}>Instructors</button>
-              <button onClick={goStudents}>Students</button>
+              <button onClick={goClasses}>Clases</button>
+              <button onClick={goActivities}>Actividades</button>
+              <button onClick={goShifts}>Turnos</button>
+              <button onClick={goInstructors}>Instructores</button>
+              <button onClick={goStudents}>Alumnos</button>
             </div>
           )}
         </>

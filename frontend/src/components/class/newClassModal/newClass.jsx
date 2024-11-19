@@ -21,7 +21,7 @@ const NewClassModal = ({ instructors, activities, turnos, closeModal }) => {
                 <div className="box has-background-warning-light">
                     <p className="subtitle is-4 has-text-weight-bold">New class</p>
                     <form onSubmit={handleSubmit}>
-                        <div className="field is-grouped">
+                        <div className="field is-grouped is-flex-wrap-wrap">
                             <div className="field">
                                 <label className="label">Instructor</label>
                                 <div className="control">

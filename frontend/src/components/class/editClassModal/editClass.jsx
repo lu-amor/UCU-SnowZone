@@ -59,7 +59,7 @@ const EditClassModal = ({ selectedClass, instructors, shifts, studentsArray, clo
                         Edit class - {selectedClass.descripcion} - {selectedClass.grupal ? 'Grupal' : 'Individual'}
                     </p>
                     <form onSubmit={handleSubmit}>
-                        <div className="field is-grouped">
+                        <div className="field is-grouped is-flex-wrap-wrap">
                             <div className="field">
                                 <label className="label">Instructor</label>
                                 <div className="control">
@@ -67,7 +67,7 @@ const EditClassModal = ({ selectedClass, instructors, shifts, studentsArray, clo
                                         <select value={instructor} onChange={(e) => setInstructor(e.target.value)}>
                                             <option value="" disabled>Select an instructor</option>
                                             {instructors.map((instructor) => (
-                                                <option key={instructor.id} value={instructor.id}>{instructor.name}</option>
+                                                <option key={instructor.id} value={instructor.id}>{instructor.nombre} {instructor.apellido}</option>
                                             ))}
                                         </select>
                                     </div>
