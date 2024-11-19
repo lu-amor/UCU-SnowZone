@@ -1,8 +1,8 @@
 .cardContainer {
     width: 260px;
     min-width: 260px;
-    height: 130px;
-    min-height: 130px;
+    height: 170px;
+    min-height: 170px;
     background-color: #ea5b0c;
     border-radius: 20px;
     display: flex;

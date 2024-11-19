@@ -3,8 +3,8 @@ import Icon from '@mdi/react';
 import { mdiDelete } from '@mdi/js'
 
 const EditEquipmentModal = ({ selectedEquipment, closeModal, updateEquipment, deleteEquipment }) => {
-    const [costo, setCosto] = useState('');
-    const [cant_disponibles, setCant_disponibles] = useState('');
+    const [costo, setCosto] = useState(0);
+    const [cant_disponibles, setCant_disponibles] = useState(0);
 
     useEffect(() => {
         if (selectedEquipment) {
@@ -28,10 +28,7 @@ const EditEquipmentModal = ({ selectedEquipment, closeModal, updateEquipment, de
                     <p className="subtitle is-4 has-text-weight-bold">Edit Equipment</p>
                     <form onSubmit={handleSubmit}>
                         <div className="field">
-                            <label className="label">{selectedEquipment.id} - {selectedEquipment.id_actividad}</label>
-                        </div>
-                        <div className="field is-grouped">
-                            <label className="label">Talle: {selectedEquipment.tamanio}</label>
+                            <label className="label">{selectedEquipment.id} - {selectedEquipment.descripcion} - {selectedEquipment.actividad} - {selectedEquipment.tamanio}</label>
                         </div>
                         <div className="field">
                             <label className="label">Cant_disponibles: {selectedEquipment.cant_disponibles}</label>

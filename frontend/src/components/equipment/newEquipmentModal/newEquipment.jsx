@@ -9,6 +9,7 @@ const NewEquipmentModal = ({ closeModal, addEquipment, actividades }) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        
         await addEquipment(id_actividad, descripcion, tamanio, costo, cant_disponibles);
         closeModal();
     };

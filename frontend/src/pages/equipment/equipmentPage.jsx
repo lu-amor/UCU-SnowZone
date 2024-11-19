@@ -9,7 +9,6 @@ const EquipmentPage = ({ equipmentArray, addEquipment, updateEquipment, deleteEq
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [selectedEquipment, setSelectedEquipment] = useState(null);
     const [isNewModalOpen, setIsNewModalOpen] = useState(false);
-
     return (
         <>
             <AuthNavBar navItem="equipment" />

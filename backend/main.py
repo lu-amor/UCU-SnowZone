@@ -3,11 +3,12 @@ from flask_login import LoginManager, login_user, logout_user, login_required, U
 import datetime
 from flask_cors import CORS
 from config import app, get_db_connection
-from datetime import datetime
-
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, resources={r"/*": {
+    "origins": "http://localhost:5173",
+    "methods": ["GET", "POST", "PATCH", "DELETE"]
+}})
 
 app.secret_key = 'your_secret_key'
 login_manager = LoginManager()
@@ -22,8 +23,6 @@ class User(UserMixin):
 @login_manager.user_loader
 def load_user(user_id):
     return User(user_id)
-
-# GET LOGIN
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -43,7 +42,6 @@ def login():
 
     return render_template('login.html')
 
-#GET STUDENTS
 @app.route('/logout')
 @login_required
 def logout():
@@ -71,7 +69,6 @@ def get_students():
             jsonify({"message": str(e)}), 400
         )
 
-#CREATE STUDENT
 @app.route("/students", methods=["POST"])
 def create_student():
     ci = request.json.get("ci")
@@ -102,24 +99,6 @@ def create_student():
         return jsonify({"message": str(e)}),400 
     return jsonify({"message": "Alumno creado correctamente"}), 201
 
-
-@app.route('/logout')
-@login_required
-def logout():
-    logout_user()
-    return redirect(url_for('login'))
-
-@app.route('/protected')
-@login_required
-def protected():
-    return "Esta es un área protegida."
-
-#GET ACTIVIDADES
-@app.route('/api/actividades', methods=['GET'])
-def api_actividades():
-    cursor.execute("SELECT * FROM actividades")
-    value = cursor.fetchall()
-    return jsonify(value)
 @app.route("/students/<int:id>", methods=["PATCH"])
 def update_student(id):
     data = request.json
@@ -380,7 +359,6 @@ def get_activities():
             jsonify({"message": str(e)}), 400
         )
 
-#ADD ACTIVIDADES
 @app.route('/activities', methods=['POST'])
 def api_add_actividad():
     data = request.json
@@ -406,7 +384,6 @@ def api_add_actividad():
         connection.close()
         return jsonify({"error": str(e)}), 500
 
-#UPDATE ACTIVIDADES
 @app.route('/activities/<int:id>', methods=['PATCH'])
 def api_update_actividad(id):
     data = request.json
@@ -437,7 +414,6 @@ def api_update_actividad(id):
         connection.close()
         return jsonify({"error": str(e)}), 500
 
-#DELETE ACTIVIDADES
 @app.route('/activities/<int:id>', methods=['DELETE'])
 def api_delete_actividad(id):
     try:
@@ -450,24 +426,6 @@ def api_delete_actividad(id):
         return jsonify({"message": "Actividad eliminada correctamente"}), 200
     except Exception as e:
         connection.rollback()
-        return jsonify({"error": str(e)}), 500
-
-
-
-#----------------------------------------- <3 Rutas de Clase :) ---------------------------------------------------
-
-#GET CLASE
-@app.route("/clases", methods =["GET"])
-def clases():
-    try:
-        connection = get_db_connection()
-        cursor = connection.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM clase")
-        value = cursor.fetchall()
-        cursor.close()
-        connection.close()
-        return jsonify({"clases": value})
-    except Exception as e:
         cursor.close()
         connection.close()
         return jsonify({"error": str(e)}), 500
@@ -497,34 +455,23 @@ def clases():
         print(e)
         print(clases)
         return jsonify({"error": str(e)}), 500
-    
-#DELETE CLASE
-@app.route("/delete_clase/<int:id>", methods=["DELETE"])
+
+@app.route("/classes/<int:id>", methods=["DELETE"])
 def delete_clase(id):
     try:
-        # Verificar si la clase está en su horario
-        if verificar_horario_clase(id):
-            return jsonify({"error": "No se puede eliminar la clase durante su horario"}), 403
-        
         connection = get_db_connection()
         cursor = connection.cursor(dictionary=True)
-
-        # Eliminar la clase de la base de datos
-        cursor.execute("DELETE FROM obligatorio.clase WHERE id = %s", (id,))
+        cursor.execute("DELETE FROM clase WHERE id = %s", (id,))
         connection.commit()
-
         cursor.close()
         connection.close()
-
         return jsonify({"message": "Clase eliminada correctamente"}), 200
-    
     except Exception as e:
         connection.rollback()
         cursor.close()
         connection.close()
         return jsonify({"error": str(e)}), 500
-    
-#ADD CLASE
+
 @app.route("/classes", methods=["POST"])
 def add_clase():
     data = request.json
@@ -533,157 +480,155 @@ def add_clase():
     turno = data.get("id_turno")
     dictada = data.get("dictada")
     grupal = data.get("grupal")
-    profesor = data.get("ci_instructor")
-    actividad = data.get("id_actividad")
-    turno = data.get("id_turno")
 
     try:
         connection = get_db_connection()
-        cursor = connection.cursor(dictionary=True, buffered=True)
-
-        # Verificar si el instructor ya tiene una clase en el mismo turno
-        cursor.execute(
-            "SELECT * FROM clase WHERE ci_instructor = %s AND id_turno = %s",
-            (profesor, turno)
-        )
-        existing_class = cursor.fetchone()
-
-        if existing_class:
-            cursor.close()
-            connection.close()
-            return jsonify({"error": "El instructor ya tiene una clase asignada en este turno"}), 400
-
-        cursor.execute(
-            "INSERT INTO clase (ci_instructor, id_actividad, id_turno) VALUES (%s, %s, %s)",
-            (profesor, actividad, turno)
-        )
+        cursor = connection.cursor(dictionary=True)
+        cursor.execute("INSERT INTO clase (ci_instructor, id_actividad, id_turno, dictada, grupal) VALUES ( %s, %s, %s, %s, %s)",
+            ( profesor, actividad, turno, dictada, grupal))
         connection.commit()
-
         cursor.close()
         connection.close()
         return jsonify({"message": "Clase agregada correctamente"}), 201
     except Exception as e:
         connection.rollback()
-        if 'cursor' in locals() and cursor:
-            cursor.close()
+        cursor.close()
         connection.close()
         return jsonify({"error": str(e)}), 500
 
-
-#UPDATE CLASE
-@app.route("/update_clase/<int:id_clase>", methods=["PATCH"])
-def update_clase(id_clase):
+@app.route("/classes/<int:id>", methods=["PATCH"])
+def update_clase(id):
     data = request.json
-    id_instructor = data.get("id_instructor")  
-    id_turno = data.get("id_turno")  
-
     fields = []
     values = []
 
+    
+    if "ci_instructor" in data:
+        fields.append("ci_instructor = %s")
+        values.append(data["ci_instructor"])
+    if "id_actividad" in data:
+        fields.append("id_actividad = %s")
+        values.append(data["id_actividad"])
+    if "id_turno" in data:
+        fields.append("Id_turno = %s")
+        values.append(data["id_turno"])
+
+    if not fields:
+        cursor.close()
+        connection.close()
+        return jsonify({"error": "No se proporcionaron campos para actualizar"}), 400
+
+    values.append(id)
+    
     try:
+        query = f"UPDATE clase SET {', '.join(fields)} WHERE id = %s"
         connection = get_db_connection()
-        with connection.cursor(dictionary=True, buffered=True) as cursor:
-            
-            # Validar si el instructor ya tiene una clase en el mismo turno
-            if id_instructor and id_turno:
-                cursor.execute(
-                    "SELECT * FROM obligatorio.clase WHERE ci_instructor = %s AND id_turno = %s AND id != %s",
-                    (id_instructor, id_turno, id_clase)
-                )
-                existing_class = cursor.fetchone()
-                if existing_class:
-                    return jsonify({"error": "El instructor ya tiene una clase asignada en este turno"}), 400
-
-            # Verificar si se permite modificar la clase en este momento (horario)
-            if not verificar_horario_clase(id_clase):
-                return jsonify({"error": "No se puede modificar la clase durante su horario"}), 403
-
-            if id_instructor:
-                fields.append("id_instructor = %s")
-                values.append(id_instructor)
-            if id_turno:
-                fields.append("id_turno = %s")
-                values.append(id_turno)
-
-            if not fields:
-                return jsonify({"error": "No se proporcionaron campos para modificar"}), 400
-
-            # Actualizar la clase
-            query = f"UPDATE obligatorio.clase SET {', '.join(fields)} WHERE id = %s"
-            cursor.execute(query, tuple(values) + (id_clase,))
-            connection.commit()
-
-            return jsonify({"message": "Clase actualizada exitosamente"}), 200
-
+        cursor = connection.cursor(dictionary=True)
+        cursor.execute(query, tuple(values))
+        connection.commit()
+        return jsonify({"message": "Clase actualizada correctamente"}), 200
     except Exception as e:
-        if connection:
-            connection.rollback()
+        connection.rollback()
+        cursor.close()
+        connection.close()
         return jsonify({"error": str(e)}), 500
 
-    finally:
-        if connection:
-            connection.close()
-
-
-#FUNCION HORARIO
-def verificar_horario_clase(id_clase):
+#-------------------------------------------- <3 Rutas de Reportes :) ---------------------------------
+@app.route("/reports/incomePerActivity", methods=["GET"])
+def get_report1():
     try:
         connection = get_db_connection()
-        with connection.cursor(dictionary=True) as cursor:
-            cursor.execute("SELECT id_turno FROM obligatorio.clase WHERE id = %s", (id_clase,))
-            clase = cursor.fetchone()
-
-            if clase:
-                id_turno = clase["id_turno"]
-                
-                # Obtener el turno de la clase
-                cursor.execute("SELECT hora_inicio, hora_fin FROM obligatorio.turno WHERE id = %s", (id_turno,))
-                turno = cursor.fetchone()
-
-                if turno:
-                    hora_inicio = turno["hora_inicio"]
-                    hora_fin = turno["hora_fin"]
-
-                    # extraemos la parte de la hora, minutos y segundos
-                    if isinstance(hora_inicio, timedelta):
-                        hora_inicio = (datetime.min + hora_inicio).time()
-                    if isinstance(hora_fin, timedelta):
-                        hora_fin = (datetime.min + hora_fin).time()
-
-                    # Obtener la hora actual como un objeto datetime.time
-                    hora_actual = datetime.now().time()  # (no la fecha)
-
-                    # Compara la hora actual con el rango de la clase
-                    if hora_inicio <= hora_actual <= hora_fin:
-                        print(f"La clase está en su horario: {hora_inicio} <= {hora_actual} <= {hora_fin}")
-                        return False
-                    else:
-                        print(f"La clase NO está en su horario: {hora_inicio} <= {hora_actual} <= {hora_fin}")
-                        return True
-
-        return False
+        cursor = connection.cursor(dictionary=True)
+        cursor.execute("""
+            SELECT a.descripcion AS actividad, SUM(ac.costo_total) AS ingresosTotales
+            FROM alumno_clase ac
+            JOIN clase c ON c.id = ac.id_clase
+            JOIN actividades a ON a.id = c.id_actividad
+            GROUP BY a.descripcion
+            ORDER BY ingresosTotales DESC;
+        """)
+        report = cursor.fetchall()
+        cursor.close()
+        connection.close()
+        return jsonify({"report": report})
     except Exception as e:
-        print(f"Error en verificar_horario_clase: {str(e)}")
-        return False
-    finally:
-        if connection:
-            connection.close()
+        return (
+            jsonify({"message": str(e)}), 400
+        )
+        
+@app.route("/reports/studentsPerActivity", methods=["GET"])
+def get_report2():
+    try:
+        connection = get_db_connection()
+        cursor = connection.cursor(dictionary=True)
+        cursor.execute("""
+            SELECT a.descripcion AS Actividad,
+                COUNT(ac.id_alumno) AS CantidadAlumnos
+            FROM clase c
+            JOIN actividades a ON c.id_actividad = a.id
+            JOIN alumno_clase ac ON c.id = ac.id_clase
+            GROUP BY a.descripcion
+            ORDER BY CantidadAlumnos DESC;
+        """)
+        report = cursor.fetchall()
+        cursor.close()
+        connection.close()
+        return jsonify({"report": report})
+    except Exception as e:
+        return (
+            jsonify({"message": str(e)}), 400
+        )
+        
+@app.route("/reports/classesPerShift", methods=["GET"])
+def get_report3():
+    try:
+        connection = get_db_connection()
+        cursor = connection.cursor(dictionary=True)
+        cursor.execute("""
+            SELECT t.hora_inicio, t.hora_fin,
+                COUNT(c.id) AS ClasesDictadas
+            FROM clase c
+            JOIN turno t ON c.id_turno = t.id
+            GROUP BY t.hora_inicio, t.hora_fin
+            ORDER BY ClasesDictadas DESC;
+        """)
+        report = cursor.fetchall()
+        for shift in report:
+            for key in ["hora_inicio", "hora_fin"]:
+                if isinstance(shift[key], datetime.timedelta):
+                    total_seconds = shift[key].total_seconds()
+                    hours = int(total_seconds // 3600)
+                    minutes = int((total_seconds % 3600) // 60)
+                    shift[key] = f"{hours:02}:{minutes:02}"
+        cursor.close()
+        connection.close()
+        return jsonify({"report": report})
+    except Exception as e:
+        return (
+            jsonify({"message": str(e)}), 400
+        )
 
+# --------------------------------- <3Rutas de Equipamiento :) ---------------------------------
 
-# --------------------------------- <3 Rutas de Equipamiento :) ---------------------------------
-
-@app.route("/equipamiento")
-def equipamiento():
-    connection = get_db_connection()
-    cursor = connection.cursor(dictionary=True)
-    cursor.execute("SELECT * FROM equipamiento_kit")
-    value = cursor.fetchall()
-    return jsonify({"equipamiento": value}), 201
+@app.route("/equipamiento", methods=["GET"])
+def get_equipment():
+    try:
+        connection = get_db_connection()
+        cursor = connection.cursor(dictionary=True)
+        cursor.execute("""SELECT a.descripcion as actividad, ek.id, id_actividad, ek.descripcion, tamanio, ek.costo, cant_disponibles FROM equipamiento_kit ek
+            join obligatorio.actividades a on ek.id_actividad = a.id""")
+        equipment = cursor.fetchall()
+        cursor.close()
+        connection.close()
+        return jsonify({"equipment": equipment})
+    except Exception as e:
+        return (
+            jsonify({"message": str(e)}), 400
+        )
 
 #ADD EQUIPAMIENTO
-@app.route("/add_equipamiento", methods=["POST"])
+@app.route("/equipamiento", methods=["POST"])
 def add_equipamiento():
-    data = request.json
     id_actividad = request.json.get("id_actividad")
     descripcion = request.json.get("descripcion")
     tamanio = request.json.get("tamanio")
@@ -709,21 +654,12 @@ def add_equipamiento():
         return jsonify({"error": str(e)}), 500
 
 #UPDATE EQUIPAMIENTO
-@app.route("/update_equipamiento/<int:id>", methods=["PATCH"])
+@app.route("/equipamiento/<int:id>", methods=["PATCH"])
 def update_equipamiento(id):
     data = request.json
     fields = []
     values = []
 
-    if "id_actividad" in data:
-        fields.append("id_actividad = %s")
-        values.append(data["id_actividad"])
-    if "descripcion" in data:
-        fields.append("descripcion = %s")
-        values.append(data["descripcion"])
-    if "tamanio" in data:
-        fields.append("tamanio = %s")
-        values.append(data["tamanio"])
     if "costo" in data:
         fields.append("costo = %s")
         values.append(data["costo"])
@@ -732,17 +668,12 @@ def update_equipamiento(id):
         values.append(data["cant_disponibles"])
 
     if not fields:
-        cursor.close()
-        connection.close()
         return jsonify({"error": "No se proporcionaron campos para actualizar"}), 400
-
-    values.append(id)
     
     try:
-        query = f"UPDATE equipamiento_kit SET {', '.join(fields)} WHERE id = %s"
         connection = get_db_connection()
         cursor = connection.cursor(dictionary=True)
-        cursor.execute(query, tuple(values))
+        cursor.execute("UPDATE equipamiento_kit SET " + ", ".join(fields) + " WHERE id = %s", values + [id],)
         connection.commit()
         cursor.close()
         connection.close()
@@ -753,29 +684,8 @@ def update_equipamiento(id):
         connection.close()
         return jsonify({"error": str(e)}), 500
 
-#GET EQUIPAMIENTO
-@app.route("/get_equipamiento/<int:id>", methods=["GET"])
-def get_equipamiento(id):
-    try:
-        connection = get_db_connection()
-        cursor = connection.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM equipamiento_kit WHERE id = %s", (id,))
-        equipamiento = cursor.fetchone()
-        if equipamiento:
-            cursor.close()
-            connection.close()
-            return jsonify({"equipamiento": equipamiento}), 200
-        else:
-            cursor.close()
-            connection.close()
-            return jsonify({"error": "Equipamiento no encontrado"}), 404
-    except Exception as e:
-        cursor.close()
-        connection.close()
-        return jsonify({"error": str(e)}), 500
-
 #DELETE EQUIPAMIENTO
-@app.route("/delete_equipamiento/<int:id>", methods=["DELETE"])
+@app.route("/equipamiento/<int:id>", methods=["DELETE"])
 def delete_equipamiento(id):
     try:
         connection = get_db_connection()
@@ -790,10 +700,8 @@ def delete_equipamiento(id):
         cursor.close()
         connection.close()
         return jsonify({"error": str(e)}), 500
-    
 
 # --------------------------------- <3Rutas de Inscripcion (alumno_clase) :) ---------------------------------
-
 @app.route("/inscripcion")
 def inscripcion():
     connection = get_db_connection()
@@ -1021,83 +929,6 @@ def update_inscripcion(id_clase, id_alumno):
             cursor.close()
         if connection:
             connection.close()
-
-
-
-# --------------------------------- <3 Rutas de Reportes :) ---------------------------------
-@app.route("/reports/incomePerActivity", methods=["GET"])
-def get_report1():
-    try:
-        connection = get_db_connection()
-        cursor = connection.cursor(dictionary=True)
-        cursor.execute("""
-            SELECT a.descripcion AS actividad, SUM(ac.costo_total) AS ingresosTotales
-            FROM alumno_clase ac
-            JOIN clase c ON c.id = ac.id_clase
-            JOIN actividades a ON a.id = c.id_actividad
-            GROUP BY a.descripcion
-            ORDER BY ingresosTotales DESC;
-        """)
-        report = cursor.fetchall()
-        cursor.close()
-        connection.close()
-        return jsonify({"report": report})
-    except Exception as e:
-        return (
-            jsonify({"message": str(e)}), 400
-        )
-        
-@app.route("/reports/studentsPerActivity", methods=["GET"])
-def get_report2():
-    try:
-        connection = get_db_connection()
-        cursor = connection.cursor(dictionary=True)
-        cursor.execute("""
-            SELECT a.descripcion AS Actividad,
-                COUNT(ac.id_alumno) AS CantidadAlumnos
-            FROM clase c
-            JOIN actividades a ON c.id_actividad = a.id
-            JOIN alumno_clase ac ON c.id = ac.id_clase
-            GROUP BY a.descripcion
-            ORDER BY CantidadAlumnos DESC;
-        """)
-        report = cursor.fetchall()
-        cursor.close()
-        connection.close()
-        return jsonify({"report": report})
-    except Exception as e:
-        return (
-            jsonify({"message": str(e)}), 400
-        )
-        
-@app.route("/reports/classesPerShift", methods=["GET"])
-def get_report3():
-    try:
-        connection = get_db_connection()
-        cursor = connection.cursor(dictionary=True)
-        cursor.execute("""
-            SELECT t.hora_inicio, t.hora_fin,
-                COUNT(c.id) AS ClasesDictadas
-            FROM clase c
-            JOIN turno t ON c.id_turno = t.id
-            GROUP BY t.hora_inicio, t.hora_fin
-            ORDER BY ClasesDictadas DESC;
-        """)
-        report = cursor.fetchall()
-        for shift in report:
-            for key in ["hora_inicio", "hora_fin"]:
-                if isinstance(shift[key], datetime.timedelta):
-                    total_seconds = shift[key].total_seconds()
-                    hours = int(total_seconds // 3600)
-                    minutes = int((total_seconds % 3600) // 60)
-                    shift[key] = f"{hours:02}:{minutes:02}"
-        cursor.close()
-        connection.close()
-        return jsonify({"report": report})
-    except Exception as e:
-        return (
-            jsonify({"message": str(e)}), 400
-        )
 
 if __name__ == "__main__":
     app.run(debug=True)

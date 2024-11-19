@@ -40,36 +40,13 @@ function App() {
   const [reportsArray, setReportsArray] = useState([]);
   const [equipmentArray, setEquipmentArray] = useState([]);
 
-useEffect(() => {  setEquipmentArray ([
-    { id: 1, id_actividad: 1, descripcion: 'Kit de Snowboard', tamanio: 'XS', costo: 600, cant_disponibles: 5 },
-    { id: 2, id_actividad: 1, descripcion: 'Kit de Snowboard', tamanio: 'S', costo: 600, cant_disponibles: 5 },
-    { id: 3, id_actividad: 1, descripcion: 'Kit de Snowboard', tamanio: 'M', costo: 600, cant_disponibles: 5 },
-    { id: 4, id_actividad: 1, descripcion: 'Kit de Snowboard', tamanio: 'L', costo: 600, cant_disponibles: 5 },
-    { id: 5, id_actividad: 1, descripcion: 'Kit de Snowboard', tamanio: 'XL', costo: 600, cant_disponibles: 5 },
-    { id: 6, id_actividad: 1, descripcion: 'Kit de Snowboard', tamanio: 'XXL', costo: 600, cant_disponibles: 5 },
-    { id: 7, id_actividad: 1, descripcion: 'Kit de Snowboard', tamanio: 'XXXL', costo: 600, cant_disponibles: 5 },
-    { id: 8, id_actividad: 2, descripcion: 'Kit de Ski', tamanio: 'XS', costo: 500, cant_disponibles: 10 },
-    { id: 9, id_actividad: 2, descripcion: 'Kit de Ski', tamanio: 'S', costo: 500, cant_disponibles: 10 },
-    { id: 10, id_actividad: 2, descripcion: 'Kit de Ski', tamanio: 'M', costo: 500, cant_disponibles: 10 },
-    { id: 11, id_actividad: 2, descripcion: 'Kit de Ski', tamanio: 'L', costo: 500, cant_disponibles: 10 },
-    { id: 12, id_actividad: 2, descripcion: 'Kit de Ski', tamanio: 'XL', costo: 500, cant_disponibles: 10 },
-    { id: 13, id_actividad: 2, descripcion: 'Kit de Ski', tamanio: 'XXL', costo: 500, cant_disponibles: 10 },
-    { id: 14, id_actividad: 2, descripcion: 'Kit de Ski', tamanio: 'XXXL', costo: 500, cant_disponibles: 10 },
-    { id: 15, id_actividad: 3, descripcion: 'Kit de Moto de Nieve', tamanio: 'XS', costo: 700, cant_disponibles: 3 },
-    { id: 16, id_actividad: 3, descripcion: 'Kit de Moto de Nieve', tamanio: 'S', costo: 700, cant_disponibles: 3 },
-    { id: 17, id_actividad: 3, descripcion: 'Kit de Moto de Nieve', tamanio: 'M', costo: 700, cant_disponibles: 3 },
-    { id: 18, id_actividad: 3, descripcion: 'Kit de Moto de Nieve', tamanio: 'L', costo: 700, cant_disponibles: 3 },
-    { id: 19, id_actividad: 3, descripcion: 'Kit de Moto de Nieve', tamanio: 'XL', costo: 700, cant_disponibles: 3 },
-    { id: 20, id_actividad: 3, descripcion: 'Kit de Moto de Nieve', tamanio: 'XXL', costo: 700, cant_disponibles: 3 },
-    { id: 21, id_actividad: 3, descripcion: 'Kit de Moto de Nieve', tamanio: 'XXXL', costo: 700, cant_disponibles: 3 }
-  ]); }, []);
-
   useEffect(() => {
     fetchStudents()
     fetchActivities()
     fetchClasses()
     fetchShifts()
     fetchInstructors()
+    fetchEquipment()
     fetchReports()
   }, []);
 
@@ -431,6 +408,93 @@ useEffect(() => {  setEquipmentArray ([
     ])});
   };
 
+  /* -------------------------- Funciones equipamiento ------------------------------------*/
+  const fetchEquipment = async () => {
+    try {
+      const response = await fetch("http://127.0.0.1:5000/equipamiento");
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data = await response.json();
+      setEquipmentArray(data.equipment);
+    } catch (error) {
+      console.error("Error fetching equipment: ", error);
+    }
+  };
+
+  async function postEquipmentAW ( equipment ) {
+    try {
+      const response = await fetch("http://127.0.0.1:5000/equipamiento", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify( equipment ),
+      });
+
+      const newEquipment = await response.json();
+      return newEquipment; 
+    } catch (error) {
+      console.log("Error posting data: ", error);
+    }
+  }
+
+  const addEquipment = async ( id_actividad, descripcion, tamanio, costo, cant_disponibles ) => {
+    const newEquipment = {
+      id_actividad: id_actividad,
+      descripcion: descripcion,
+      tamanio: tamanio,
+      costo: costo,
+      cant_disponibles: cant_disponibles
+    };
+    console.log(newEquipment);
+    const equipment = await postEquipmentAW(newEquipment);
+    setEquipmentArray([...equipmentArray, equipment]);
+  };
+
+  async function updateEquipmentAW ( equipment ) {
+    try {
+      await fetch(`http://127.0.0.1:5000/equipamiento/${ equipment.id }`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify( equipment ),
+      });
+    } catch (error) {
+      console.error("Error updating data: ", error);
+    }
+  }
+
+  const updateEquipment = (equipment) => {
+    updateEquipmentAW( equipment ).then(() => {
+      setEquipmentArray([
+      ...equipmentArray.map((currentEquipment) =>
+        currentEquipment.id === equipment.id ? equipment : currentEquipment
+      ),
+    ])});
+  };
+
+  async function deleteEquipmentAW( equipment ) {
+    try {
+      await fetch(`http://127.0.0.1:5000/equipamiento/${ equipment.id }`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+    } catch (error) {
+      console.error("Error deleting data: ", error);
+    }
+  }
+
+  const deleteEquipment = (equipment) => {
+    deleteEquipmentAW( equipment ).then(() => {
+      setEquipmentArray([
+      ...equipmentArray.filter((currentEquipment) => currentEquipment.id !== equipment.id),
+    ])});
+  };
+
   /* -------------------------- Funciones reportes ------------------------------------*/
   const fetchReports = async () => {
     try {
@@ -482,7 +546,7 @@ useEffect(() => {  setEquipmentArray ([
         <Route path="/shiftsS" element={<ShiftsPageS shiftsArray={shiftsArray}/>}></Route>
 
         <Route path="/reports" element={<ReportsPage reportsArray={reportsArray}/>}></Route>
-        <Route path="/equipment" element={<EquipmentPage equipmentArray={equipmentArray} actividades={activitiesArray}/>}></Route>
+        <Route path="/equipment" element={<EquipmentPage equipmentArray={equipmentArray} actividades={activitiesArray} addEquipment={addEquipment} updateEquipment={updateEquipment} deleteEquipment={deleteEquipment}/>}></Route>
     </Routes>
   )
 };
