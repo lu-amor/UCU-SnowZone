@@ -6,7 +6,6 @@ import EditShiftModal from "../../components/shift/editShiftModal/editShift";
 import NewShiftModal from "../../components/shift/newShiftModal/newShift";
 
 const shiftsPage = ({shiftsArray, addShift, updateShift, deleteShift}) => {
-    const [shiftList, setShiftList] = useState([]);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [selectedShift, setSelectedShift] = useState(null);
     const [isNewModalOpen, setIsNewModalOpen] = useState(false);
@@ -15,12 +14,12 @@ const shiftsPage = ({shiftsArray, addShift, updateShift, deleteShift}) => {
         <>
             <AuthNavBar navItem="shifts" />
             <div className={`${classes.content}`}>
-                <h1 className={`${classes.header}`}>Shifts</h1>
+                <h1 className={`${classes.header}`}>Turnos</h1>
                 <div className={`${classes.buttonContainer}`}>
                     <button
                         id="addShiftButton"
                         className={`button is-medium is-primary ${classes.addShiftButton}`}
-                        onClick={() => setIsNewModalOpen(true)}>add Shift</button>
+                        onClick={() => setIsNewModalOpen(true)}>Nuevo Turno</button>
                 </div>
                 <div className={`${classes.cardsContainer}`}>
                     {shiftsArray.map((shift) => {
@@ -28,8 +27,6 @@ const shiftsPage = ({shiftsArray, addShift, updateShift, deleteShift}) => {
                             <ShiftCard
                             key={shift.id}
                             shift={shift}
-                            deleteShift={deleteShift}
-                            updateShift={updateShift}
                             openEditModal={() => {
                                 setSelectedShift(shift);
                                 setIsEditModalOpen(true);
@@ -43,6 +40,7 @@ const shiftsPage = ({shiftsArray, addShift, updateShift, deleteShift}) => {
                 <EditShiftModal
                     closeModal={() => setIsEditModalOpen(false)}
                     updateShift={updateShift}
+                    deleteShift={deleteShift}
                     selectedShift={selectedShift}
                 />
             )}

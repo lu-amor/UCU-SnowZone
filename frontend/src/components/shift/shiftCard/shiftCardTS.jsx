@@ -6,7 +6,7 @@ function ShiftCard({ shift }) {
         <div className={classes.cardContainer}>
             <div className={classes.cardContent}>
                 <h4 className={`${classes.title}`}>
-                    {shift.from} - {shift.to}
+                    {shift.hora_inicio} - {shift.hora_fin}
                 </h4>
             </div>
         </div>

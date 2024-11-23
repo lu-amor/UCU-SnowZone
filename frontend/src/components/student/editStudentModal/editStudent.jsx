@@ -3,22 +3,27 @@ import Icon from '@mdi/react';
 import { mdiDelete } from '@mdi/js'
 
 const EditStudentModal = ({ selectedStudent, closeModal, updateStudent, deleteStudent }) => {
-    const [tel, setTel] = useState('');
     const [mail, setMail] = useState('');
+    const [tel, setTel] = useState('');
 
     useEffect(() => {
         if (selectedStudent) {
-            setTel(selectedStudent.tel);
             setMail(selectedStudent.mail);
+            setTel(selectedStudent.tel);
         }
     }, [selectedStudent]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const updatedStudent = { ...selectedStudent, tel, mail};
+        const updatedStudent = { ...selectedStudent, mail, tel};
         await updateStudent(updatedStudent);
         closeModal();
     };
+
+    const handleDelete = () => {
+        deleteStudent(selectedStudent);
+        closeModal();
+    }
 
     return (
         <div className="modal is-active">
@@ -32,7 +37,7 @@ const EditStudentModal = ({ selectedStudent, closeModal, updateStudent, deleteSt
                         </div>
                         <div className="field is-grouped">
                             <label className="label">CI: {selectedStudent.ci}</label>
-                            <label className="label">Birthdate: {selectedStudent.f_nac}</label>
+                            <label className="label">Birthdate: {selectedStudent.f_nac.split('00:00')[0].split(', ')[1]}</label>
                         </div>
                         <div className="field">
                             <label className="label">Tel: {selectedStudent.tel}</label>
@@ -51,7 +56,7 @@ const EditStudentModal = ({ selectedStudent, closeModal, updateStudent, deleteSt
                                 type="button" 
                                 className={`button is-primary is-justify-self-flex-end`} 
                                 onClick={() => {
-                                    deleteStudent();
+                                    handleDelete();
                                     closeModal();
                                 }}
                                 > <Icon path={mdiDelete} size={1.5} color='#ffffff' />

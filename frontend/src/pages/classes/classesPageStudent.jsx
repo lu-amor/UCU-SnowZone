@@ -8,7 +8,7 @@ const classesPageStudents = ({classesArray}) => {
         <>
             <AuthNavBarS navItem="classes" />
             <div className={`${classes.content}`}>
-                <h1 className={`${classes.header} mb-5`}>Classes</h1>
+                <h1 className={`${classes.header} mb-5`}>Clases</h1>
                 <div className={`${classes.cardsContainer}`}>
                     {classesArray.map((clase) => {
                         return (

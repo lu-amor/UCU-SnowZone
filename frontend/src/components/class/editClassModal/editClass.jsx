@@ -56,10 +56,10 @@ const EditClassModal = ({ selectedClass, instructors, shifts, studentsArray, clo
             <div className="modal-content">
                 <div className="box has-background-warning-light">
                     <p className="subtitle is-4 has-text-weight-bold">
-                        Edit class - {selectedClass.activity} - {selectedClass.grupal ? 'Group' : 'Individual'}
+                        Edit class - {selectedClass.descripcion} - {selectedClass.grupal ? 'Grupal' : 'Individual'}
                     </p>
                     <form onSubmit={handleSubmit}>
-                        <div className="field is-grouped">
+                        <div className="field is-grouped is-flex-wrap-wrap">
                             <div className="field">
                                 <label className="label">Instructor</label>
                                 <div className="control">
@@ -67,7 +67,7 @@ const EditClassModal = ({ selectedClass, instructors, shifts, studentsArray, clo
                                         <select value={instructor} onChange={(e) => setInstructor(e.target.value)}>
                                             <option value="" disabled>Select an instructor</option>
                                             {instructors.map((instructor) => (
-                                                <option key={instructor.id} value={instructor.id}>{instructor.name}</option>
+                                                <option key={instructor.id} value={instructor.id}>{instructor.nombre} {instructor.apellido}</option>
                                             ))}
                                         </select>
                                     </div>
@@ -80,7 +80,7 @@ const EditClassModal = ({ selectedClass, instructors, shifts, studentsArray, clo
                                         <select value={shift} onChange={(e) => setShift(e.target.value)}>
                                             <option value="" disabled>Select a shift</option>
                                             {shifts.map((shift) => (
-                                                <option key={shift.id} value={shift.id}>{shift.from} - {shift.to}</option>
+                                                <option key={shift.id} value={shift.id}>{shift.hora_inicio} - {shift.hora_fin}</option>
                                             ))}
                                         </select>
                                     </div>
@@ -151,10 +151,10 @@ const EditClassModal = ({ selectedClass, instructors, shifts, studentsArray, clo
                         </div>
                         <div className={`field is-grouped is-justify-content-flex-end`}>
                             <div className="control">
-                                <button type="button" className={`button is-danger has-text-white  `} onClick={closeModal}>Cancelar</button>
+                                <button type="button" className={`button is-danger has-text-white`} onClick={closeModal}>Cancelar</button>
                             </div>
                             <div className="control">
-                                <button type="submit" className={`button is-success has-text-white  `}>Aceptar</button>
+                                <button type="submit" className={`button is-success has-text-white`}>Aceptar</button>
                             </div>
                         </div>
                     </form>

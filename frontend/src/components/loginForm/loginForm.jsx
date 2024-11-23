@@ -81,7 +81,7 @@ function LoginForm() {
               style={{ font: "12px arial", marginBottom: "10px" }}
               onClick={handleForgotPassword}
             >
-              Forgot yor password?
+              Forgot your password?
             </button>
           </div>
         </div>

@@ -3,78 +3,66 @@ import classes from "./reportsPage.module.css";
 import AuthNavBar from "../../components/navBar/navBar";
 
 const reportsPage = ({ reportsArray }) => {
-    const [selectedTab, setSelectedTab] = useState('Income per activity');
+    const [selectedTabIndex, setSelectedTabIndex] = useState(0);
 
     const renderContent = () => {
-        const selectedReport = reportsArray.find(report => report.type === selectedTab);
-        if (!selectedReport) return null;
+        if (!reportsArray || !Array.isArray(reportsArray) || reportsArray.length < 3) {
+            return <div>Cargando datos...</div>;
+        }
 
-        const sortedData = [...selectedReport.data].sort((a, b) => {
-            switch (selectedTab) {
-                case 'Income per activity':
-                    return b.income - a.income;
-                case 'Students per activity':
-                    return b.students - a.students;
-                case 'Classes per shift':
-                    return b.classes - a.classes;
-                default:
-                    return 0;
-            }
-        });
-
-        switch (selectedTab) {
-            case 'Income per activity':
+        switch (selectedTabIndex) {
+            case 0: // Income per activity
                 return (
                     <table className={`table is-fullwidth is-striped`}>
                         <thead>
                             <tr className={`is-info`}>
-                                <th className={`has-text-white`} style={{ fontSize: '1.3rem', paddingLeft: '2rem' }}>Activity</th>
-                                <th className={`has-text-white`} style={{ fontSize: '1.3rem', textAlign: 'right', paddingRight: '2rem' }}>Income</th>
+                                <th className={`has-text-white`} style={{ fontSize: "1.3rem", paddingLeft: "2rem" }}>Actividad</th>
+                                <th className={`has-text-white`} style={{ fontSize: "1.3rem", textAlign: "right", paddingRight: "2rem" }}>Ingresos</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {sortedData.map((report, index) => (
+                            {reportsArray[0].map((report, index) => (
                                 <tr key={index}>
-                                    <td style={{ fontSize: '1rem', paddingLeft: '2rem' }}>{report.activity}</td>
-                                    <td style={{ fontSize: '1rem', textAlign: 'right', paddingRight: '2rem' }}>{report.income}</td>
+                                    <td style={{ fontSize: "1rem", paddingLeft: "2rem" }}>{report.actividad}</td>
+                                    <td style={{ fontSize: "1rem", textAlign: "right", paddingRight: "2rem" }}>{report.ingresosTotales}</td>
                                 </tr>
                             ))}
                         </tbody>
                     </table>
                 );
-            case 'Students per activity':
+            case 1: // Students per activity
                 return (
                     <table className={`table is-fullwidth is-striped`}>
                         <thead>
                             <tr className={`is-info`}>
-                            <th className={`has-text-white`} style={{ fontSize: '1.3rem', paddingLeft: '2rem' }}>Activity</th>
-                            <th className={`has-text-white`} style={{ fontSize: '1.3rem', textAlign: 'right', paddingRight: '2rem' }}>No. Students</th>
+                                <th className={`has-text-white`} style={{ fontSize: "1.3rem", paddingLeft: "2rem" }}>Actividad</th>
+                                <th className={`has-text-white`} style={{ fontSize: "1.3rem", textAlign: "right", paddingRight: "2rem" }}>Cant. alumnos</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {sortedData.map((report, index) => (
+                            {reportsArray[1].map((report, index) => (
                                 <tr key={index}>
-                                    <td style={{ fontSize: '1rem', paddingLeft: '2rem' }}>{report.activity}</td>
-                                    <td style={{ fontSize: '1rem', textAlign: 'right', paddingRight: '2rem' }}>{report.students}</td>
+                                    <td style={{ fontSize: "1rem", paddingLeft: "2rem" }}>{report.Actividad}</td>
+                                    <td style={{ fontSize: "1rem", textAlign: "right", paddingRight: "2rem" }}>{report.CantidadAlumnos}</td>
                                 </tr>
                             ))}
                         </tbody>
                     </table>
                 );
-            case 'Classes per shift':
+            case 2: // Classes per shift
                 return (
                     <table className={`table is-fullwidth is-striped`}>
                         <thead>
                             <tr className={`is-info`}>
-                            <th className={`has-text-white`} style={{ fontSize: '1.3rem', paddingLeft: '2rem' }}>Shift</th>
-                            <th className={`has-text-white`} style={{ fontSize: '1.3rem', textAlign: 'right', paddingRight: '2rem' }}>No. Classes</th>
+                                <th className={`has-text-white`} style={{ fontSize: "1.3rem", paddingLeft: "2rem" }}>Turno</th>
+                                <th className={`has-text-white`} style={{ fontSize: "1.3rem", textAlign: "right", paddingRight: "2rem" }}>Cant. clases</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {sortedData.map((report, index) => (
+                            {reportsArray[2].map((report, index) => (
                                 <tr key={index}>
-                                    <td style={{ fontSize: '1rem', paddingLeft: '2rem' }}>{report.shift}</td>
-                                    <td style={{ fontSize: '1rem', textAlign: 'right', paddingRight: '2rem' }}>{report.classes}</td>
+                                    <td style={{ fontSize: "1rem", paddingLeft: "2rem" }}>{report.hora_inicio} - {report.hora_fin}</td>
+                                    <td style={{ fontSize: "1rem", textAlign: "right", paddingRight: "2rem" }}>{report.ClasesDictadas}</td>
                                 </tr>
                             ))}
                         </tbody>
@@ -89,24 +77,24 @@ const reportsPage = ({ reportsArray }) => {
         <>
             <AuthNavBar navItem="reports" />
             <div className={`${classes.content}`}>
-                <h1 className={`${classes.header}`}>Reports</h1>
+                <h1 className={`${classes.header}`}>Reportes</h1>
             </div>
             <div className={`${classes.reportsContainer}`}>
                 <div className="tabs is-right is-small is-boxed">
                     <ul>
-                        <li className={selectedTab === 'Income per activity' ? 'is-active' : ''}>
-                            <a onClick={() => setSelectedTab('Income per activity')}>
-                                <span>Income per activity</span>
+                        <li className={selectedTabIndex === 0 ? "is-active" : ""}>
+                            <a onClick={() => setSelectedTabIndex(0)}>
+                                <span>Ingresos por actividad</span>
                             </a>
                         </li>
-                        <li className={selectedTab === 'Students per activity' ? 'is-active' : ''}>
-                            <a onClick={() => setSelectedTab('Students per activity')}>
-                                <span>Students per activity</span>
+                        <li className={selectedTabIndex === 1 ? "is-active" : ""}>
+                            <a onClick={() => setSelectedTabIndex(1)}>
+                                <span>Alumnos por actividad</span>
                             </a>
                         </li>
-                        <li className={selectedTab === 'Classes per shift' ? 'is-active' : ''}>
-                            <a onClick={() => setSelectedTab('Classes per shift')}>
-                                <span>Classes per shift</span>
+                        <li className={selectedTabIndex === 2 ? "is-active" : ""}>
+                            <a onClick={() => setSelectedTabIndex(2)}>
+                                <span>Clases por turno</span>
                             </a>
                         </li>
                     </ul>

@@ -9,7 +9,7 @@ const ActivitiesPageT = ({activitiesArray}) => {
         <>
             <AuthNavBarT navItem="activities" />
             <div className={`${classes.content}`}>
-                <h1 className={`${classes.header} mb-4`}>Activities</h1>
+                <h1 className={`${classes.header} mb-4`}>Actividades</h1>
                 <div className={`${classes.cardsContainer}`}>
                     {activitiesArray.map((activity) => {
                         return (

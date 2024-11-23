@@ -4,12 +4,12 @@ import Icon from '@mdi/react';
 import { mdiCheckCircle } from '@mdi/js'
 import { mdiRadioboxBlank } from '@mdi/js';
 
-function ClassCard({ openEditModal, clase, deleteClass, updateClass }) {
-    const [taught, setTaught] = useState(clase.taught);
+function ClassCard({ openEditModal, clase }) {
+    const [dictada, setDictada] = useState(clase.dictada);
 
-    const handleTaughtBtn = () => {
-        clase.taught = !clase.taught;
-        setTaught(clase.taught);
+    const handleDictadaBtn = () => {
+        clase.dictada = !clase.dictada;
+        setDictada(clase.dictada);
         updateClass(clase);
     };
 
@@ -21,25 +21,25 @@ function ClassCard({ openEditModal, clase, deleteClass, updateClass }) {
                 </h4>
                 <div className={`${classes.dataContainer}`}>
                     <p className={`${classes.data}`} id={classes.activity}>
-                        {clase.activity}
+                        {clase.descripcion}
                     </p>
                     <div className={`${classes.time}`}>
                         <p className={`${classes.data}`} id={classes.from}>
-                            {clase.from}
+                            {clase.hora_inicio}
                         </p>
                         <p className={`${classes.data}`}>
                             -
                         </p>
                         <p className={`${classes.data}`} id={classes.to}>
-                            {clase.to}
+                            {clase.hora_fin}
                         </p>
                     </div>
                     <p className={`${classes.data}`} id={classes.instructor}>
-                        {clase.instructor}
+                        {clase.apellido} {clase.nombre}
                     </p>
                 </div>
             </div>
-            <button onClick={handleTaughtBtn} className={`${classes.buttonTaught}`}>{taught ? <Icon path={mdiRadioboxBlank} size={1} color="white" /> : <Icon path={mdiCheckCircle} size={1} color="white" />}</button>
+            <button onClick={handleDictadaBtn} className={`${classes.buttonDictada}`}>{dictada ? <Icon path={mdiRadioboxBlank} size={1} color="white" /> : <Icon path={mdiCheckCircle} size={1} color="white" />}</button>
         </div>
     );
 }

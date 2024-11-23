@@ -6,7 +6,6 @@ import EditClassModal from "../../components/class/editClassModal/editClass";
 import NewClassModal from "../../components/class/newClassModal/newClass";
 
 const classesPage = ({classesArray, instructors, shifts, activities, studentsArray, addClass, updateClass, deleteClass}) => {
-    const [classList, setClassList] = useState([]);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [selectedClass, setSelectedClass] = useState(null);
     const [isNewModalOpen, setIsNewModalOpen] = useState(false);
@@ -15,24 +14,22 @@ const classesPage = ({classesArray, instructors, shifts, activities, studentsArr
         <>
             <AuthNavBar navItem="classes" />
             <div className={`${classes.content}`}>
-                <h1 className={`${classes.header}`}>Classes</h1>
+                <h1 className={`${classes.header}`}>Clases</h1>
                 <div className={`${classes.buttonContainer}`}>
                     <button
                         id="addClassButton"
                         className={`button is-primary ${classes.addClassButton}`}
-                        onClick={() => setIsNewModalOpen(true)}>add Class</button>
+                        onClick={() => setIsNewModalOpen(true)}>Nueva Clase</button>
                 </div>
                 <div className={`${classes.cardsContainer}`}>
                     {classesArray.map((clase) => {
                         return (
                             <ClassCard
-                            key={clase.id}
-                            clase={clase}
-                            deleteClass={deleteClass}
-                            updateClass={updateClass}
-                            openEditModal={() => {
-                                setSelectedClass(clase);
-                                setIsEditModalOpen(true);
+                                key={clase.id}
+                                clase={clase}
+                                openEditModal={() => {
+                                    setSelectedClass(clase);
+                                    setIsEditModalOpen(true);
                             }}
                             />
                         );
@@ -54,7 +51,7 @@ const classesPage = ({classesArray, instructors, shifts, activities, studentsArr
                     closeModal={() => setIsNewModalOpen(false)}
                     addClass={addClass}
                     instructors={instructors}
-                    shifts={shifts}
+                    turnos={shifts}
                     studentsArray={studentsArray}
                     activities={activities}
                 />
