@@ -1,4 +1,5 @@
-import React, {useState, useEffect} from 'react'
+import { useState, useEffect } from 'react'
+import StudentList from './StudentList'
 import './App.css'
 import Home from './pages/home/home'
 import HomeTeacher from './pages/home/homeTeacher'
