@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 const NewStudentModal = ({ closeModal, addStudent }) => {
-    const [ci, setCI] = useState('');
+    const [ci, setCI] = useState(0);
     const [nombre, setNombre] = useState('');
     const [apellido, setApellido] = useState('');
     const [f_nac, setF_nac] = useState('');
@@ -48,55 +48,47 @@ const NewStudentModal = ({ closeModal, addStudent }) => {
                 <div className="box has-background-warning-light">
                     <p className="subtitle is-4 has-text-weight-bold">New Student</p>
                     <form onSubmit={handleSubmit}>
-                        <div className="field is-grouped is-flex-wrap-wrap">
-                            <div className="is-grouped">
-                                <label className="label">Nombre:</label>
-                                <div className="control">
-                                    <input
-                                        className="input"
-                                        type="text"
-                                        value={nombre}
-                                        onChange={(e) => setNombre(e.target.value)}
-                                        required
-                                    />
-                                </div>
+                        <div className="field is-grouped">
+                            <label className="label">Nombre:</label>
+                            <div className="control">
+                                <input
+                                    className="input"
+                                    type="text"
+                                    value={nombre}
+                                    onChange={(e) => setNombre(e.target.value)}
+                                    required
+                                />
                             </div>
-                            <div className="is-grouped">
-                                <label className="label">Apellido:</label>
-                                <div className="control">
-                                    <input
-                                        className="input"
-                                        type="text"
-                                        value={apellido}
-                                        onChange={(e) => setApellido(e.target.value)}
-                                        required
-                                    />
-                                </div>
+                            <label className="label">Apellido:</label>
+                            <div className="control">
+                                <input
+                                    className="input"
+                                    type="text"
+                                    value={apellido}
+                                    onChange={(e) => setApellido(e.target.value)}
+                                    required
+                                />
                             </div>
                         </div>
-                        <div className="field is-grouped is-flex-wrap-wrap">
-                            <div className="is-grouped">
-                                <label className="label">F. Nacimiento:</label>
-                                <div className="control">
-                                    <input
-                                        className="input"
-                                        type="date"
-                                        value={f_nac}
-                                        onChange={(e) => setF_nac(e.target.value)}
-                                    />
-                                </div>
+                        <div className="field is-grouped">
+                            <label className="label">F. Nacimiento:</label>
+                            <div className="control">
+                                <input
+                                    className="input"
+                                    type="date"
+                                    value={f_nac}
+                                    onChange={(e) => setF_nac(e.target.value)}
+                                />
                             </div>
-                            <div className="is-grouped">
-                                <label className="label">Cédula:</label>
-                                <div className="control">
-                                    <input
-                                        className="input"
-                                        type="number"
-                                        value={ci}
-                                        onChange={(e) => setCI(parseInt(e.target.value, 10))}
+                            <label className="label">Cédula:</label>
+                            <div className="control">
+                                <input
+                                    className="input"
+                                    type="number"
+                                    value={ci}
+                                    onChange={(e) => setCI(parseInt(e.target.value, 10))}
 
-                                    />
-                                </div>
+                                />
                             </div>
                         </div>
                         <div className="field">

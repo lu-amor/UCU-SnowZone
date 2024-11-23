@@ -8,12 +8,12 @@ const InstructorsPageS = ({instructorsArray}) => {
         <>
             <AuthNavBarS navItem="instructors" />
             <div className={`${classes.content}`}>
-                <h1 className={`${classes.header} mb-4`}>Instructores</h1>
+                <h1 className={`${classes.header} mb-4`}>Instructors</h1>
                 <div className={`${classes.cardsContainer}`}>
                     {instructorsArray.map((instructor) => {
                         return (
                             <InstructorCard
-                            key={instructor.ci}
+                            key={instructor.id}
                             instructor={instructor}
                             />
                         );

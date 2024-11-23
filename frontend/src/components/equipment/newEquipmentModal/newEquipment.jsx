@@ -9,7 +9,7 @@ const NewEquipmentModal = ({ closeModal, addEquipment, actividades }) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
+        
         await addEquipment(id_actividad, descripcion, tamanio, costo, cant_disponibles);
         closeModal();
     };
@@ -33,57 +33,49 @@ const NewEquipmentModal = ({ closeModal, addEquipment, actividades }) => {
                                 />
                             </div>
                         </div>
-                        <div className="field is-grouped is-flex-wrap-wrap">
-                            <div className="is-grouped">
-                                <label className="label">Tamanio:</label>
-                                <div className="select">
-                                    <select value={tamanio} onChange={(e) => setTamanio(e.target.value)}>
-                                        <option value="" disabled>Seleccionar talle</option>
-                                        <option value="XS">XS</option>
-                                        <option value="S">S</option>
-                                        <option value="M">M</option>
-                                        <option value="L">L</option>
-                                        <option value="XL">XL</option>
-                                        <option value="XXL">XXL</option>
-                                        <option value="XXXL">XXXL</option>
-                                    </select>
-                                </div>
+                        <div className="field is-grouped">
+                            <label className="label">Tamanio:</label>
+                            <div className="select">
+                                <select value={tamanio} onChange={(e) => setTamanio(e.target.value)}>
+                                    <option value="" disabled>Seleccionar talle</option>
+                                    <option value="XS">XS</option>
+                                    <option value="S">S</option>
+                                    <option value="M">M</option>
+                                    <option value="L">L</option>
+                                    <option value="XL">XL</option>
+                                    <option value="XXL">XXL</option>
+                                    <option value="XXXL">XXXL</option>
+                                </select>
                             </div>
-                            <div className="is-grouped">
-                                <label className="label">Actividad:</label>
-                                <div className='select'>
-                                    <select value={id_actividad} onChange={(e) => setid_actividad(e.target.value)}>
-                                        <option value="" disabled>Seleccionar actividad</option>
-                                        {actividades.map((actividad) => (
-                                            <option key={actividad.id} value={actividad.id}>{actividad.descripcion}</option>
-                                        ))}
-                                    </select>
-                                </div>
+                            <label className="label">Actividad:</label>
+                            <div className='select'>
+                                <select value={id_actividad} onChange={(e) => setid_actividad(e.target.value)}>
+                                    <option value="" disabled>Seleccionar actividad</option>
+                                    {actividades.map((actividad) => (
+                                        <option key={actividad.id} value={actividad.id}>{actividad.descripcion}</option>
+                                    ))}
+                                </select>
                             </div>
                         </div>
-                        <div className="field is-grouped is-flex-wrap-wrap">
-                            <div className="is-grouped">
-                                <label className="label">Cant. disponibles:</label>
-                                <div className="control">
-                                    <input
-                                        className="input"
-                                        type="number"
-                                        value={cant_disponibles}
-                                        onChange={(e) => setCantDisponibles(e.target.value)}
-                                        required
-                                    />
-                                </div>
+                        <div className="field is-grouped">
+                            <label className="label">Cant. disponibles:</label>
+                            <div className="control">
+                                <input
+                                    className="input"
+                                    type="number"
+                                    value={cant_disponibles}
+                                    onChange={(e) => setCantDisponibles(e.target.value)}
+                                    required
+                                />
                             </div>
-                            <div className="is-grouped">
-                                <label className="label">Costo:</label>
-                                <div className="control">
-                                    <input
-                                        className="input"
-                                        type="number"
-                                        value={costo}
-                                        onChange={(e) => setCosto(e.target.value)}
-                                    />
-                                </div>
+                            <label className="label">Costo:</label>
+                            <div className="control">
+                                <input
+                                    className="input"
+                                    type="number"
+                                    value={costo}
+                                    onChange={(e) => setCosto(e.target.value)}
+                                />
                             </div>
                         </div>
                         <div className={`field is-grouped is-justify-content-flex-end`}>

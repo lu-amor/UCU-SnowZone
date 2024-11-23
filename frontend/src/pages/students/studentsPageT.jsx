@@ -9,12 +9,12 @@ const StudentsPageT = ({studentsArray}) => {
         <>
             <AuthNavBarT navItem="students" />
             <div className={`${classes.content}`}>
-                <h1 className={`${classes.header} mb-4`}>Alumnos</h1>
+                <h1 className={`${classes.header} mb-4`}>Students</h1>
                 <div className={`${classes.cardsContainer}`}>
                     {studentsArray.map((student) => {
                         return (
                             <StudentCard
-                            key={student.ci}
+                            key={student.id}
                             student={student}
                             />
                         );

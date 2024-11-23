@@ -7,12 +7,12 @@ const HomeTeacher = () => {
         <div>
             <NavBarT />
             <div className={classes.content}>
-                <h1 className={`${classes.title}`}>Inicio</h1>
+                <h1 className={`${classes.title}`}>Home</h1>
                 <p className={`${classes.paragraph}`} style={{fontWeight: "bold"}}>
-                    Bienvenido al sistema de gestión UCU SnowZone.
+                    Welcome to the UCU SnowZone management system.
                 </p>
                 <p className={`${classes.paragraph}`}>
-                    Utilice la barra de navegación para acceder a las diferentes secciones del sistema.
+                    Use the navigation bar to access the different sections of the system.
                 </p>
             </div>
         </div>

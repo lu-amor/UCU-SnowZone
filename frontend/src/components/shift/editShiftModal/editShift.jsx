@@ -27,7 +27,7 @@ const EditShiftModal = ({ selectedShift, closeModal, updateShift, deleteShift })
                 <div className="box has-background-warning-light">
                     <p className="subtitle is-4 has-text-weight-bold">Edit shift</p>
                     <form onSubmit={handleSubmit}>
-                        <div className="field is-grouped is-flex-wrap-wrap">
+                        <div className="field is-grouped">
                             <label className="label">From: {selectedShift.hora_inicio}</label>
                             <div className="control">
                                 <input type="time" className="input is-success" value={hora_inicio} onChange={(e) => setHoraInicio(e.target.value)} />

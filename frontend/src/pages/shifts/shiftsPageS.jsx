@@ -8,7 +8,7 @@ const ShiftsPageS = ({shiftsArray }) => {
         <>
             <AuthNavBarS navItem="shifts" />
             <div className={`${classes.content}`}>
-                <h1 className={`${classes.header} mb-4`}>Turnos</h1>
+                <h1 className={`${classes.header} mb-4`}>Shifts</h1>
                 <div className={`${classes.cardsContainer}`}>
                     {shiftsArray.map((shift) => {
                         return (

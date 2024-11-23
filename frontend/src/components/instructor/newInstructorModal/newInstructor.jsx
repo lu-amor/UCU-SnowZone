@@ -21,54 +21,46 @@ const NewInstructorModal = ({ closeModal, addInstructor }) => {
                 <div className="box has-background-warning-light">
                     <p className="subtitle is-4 has-text-weight-bold">New Instructor</p>
                     <form onSubmit={handleSubmit}>
-                        <div className="field is-grouped is-flex-wrap-wrap">
-                            <div className="is-grouped">
-                                <label className="label">Nombre:</label>
-                                <div className="control">
-                                    <input
-                                        className="input"
-                                        type="text"
-                                        value={nombre}
-                                        onChange={(e) => setNombre(e.target.value)}
-                                        required
-                                    />
-                                </div>
+                        <div className="field is-grouped">
+                            <label className="label">Nombre:</label>
+                            <div className="control">
+                                <input
+                                    className="input"
+                                    type="text"
+                                    value={nombre}
+                                    onChange={(e) => setNombre(e.target.value)}
+                                    required
+                                />
                             </div>
-                            <div className="is-grouped">
-                                <label className="label">Apellido:</label>
-                                <div className="control">
-                                    <input
-                                        className="input"
-                                        type="text"
-                                        value={apellido}
-                                        onChange={(e) => setApellido(e.target.value)}
-                                        required
-                                    />
-                                </div>
+                            <label className="label">Apellido:</label>
+                            <div className="control">
+                                <input
+                                    className="input"
+                                    type="text"
+                                    value={apellido}
+                                    onChange={(e) => setApellido(e.target.value)}
+                                    required
+                                />
                             </div>
                         </div>
-                        <div className="field is-grouped is-flex-wrap-wrap">
-                            <div className="is-grouped">
-                                <label className="label">F. Nacimiento:</label>
-                                <div className="control">
-                                    <input
-                                        className="input"
-                                        type="date"
-                                        value={f_nac}
-                                        onChange={(e) => setFNac(e.target.value)}
-                                    />
-                                </div>
+                        <div className="field is-grouped">
+                            <label className="label">F. Nacimiento:</label>
+                            <div className="control">
+                                <input
+                                    className="input"
+                                    type="date"
+                                    value={f_nac}
+                                    onChange={(e) => setFNac(e.target.value)}
+                                />
                             </div>
-                            <div className="is-grouped">
-                                <label className="label">Cédula:</label>
-                                <div className="control">
-                                    <input
-                                        className="input"
-                                        type="text"
-                                        value={ci}
-                                        onChange={(e) => setci(e.target.value)}
-                                    />
-                                </div>
+                            <label className="label">Cédula:</label>
+                            <div className="control">
+                                <input
+                                    className="input"
+                                    type="text"
+                                    value={ci}
+                                    onChange={(e) => setci(e.target.value)}
+                                />
                             </div>
                         </div>
                         <div className="field">

@@ -43,46 +43,46 @@ function AuthNavBarS({ navItem }) {
             <button onClick={goClasses} className={classes.underlineButton}>
             {navItem === "classes" ? (
                 <strong className={classes.buttonSelected}>
-                  Clases
+                  Classes
                 </strong>
               ) : (
-                <span>Clases</span>
+                <span>Classes</span>
               )}
             </button>
             <button onClick={goActivities} className={classes.underlineButton}>
               {navItem === "activities" ? (
                 <strong className={classes.buttonSelected}>
-                  Actividades
+                  Activities
                 </strong>
               ) : (
-                <span>Actividades</span>
+                <span>Activities</span>
               )}
             </button>
             <button onClick={goShifts} className={classes.underlineButton}>
               {navItem === "shifts" ? (
                 <strong className={classes.buttonSelected}>
-                  Turnos
+                  Shifts
                 </strong>
               ) : (
-                <span>Turnos</span>
+                <span>Shifts</span>
               )}
             </button>
             <button onClick={goInstructors} className={classes.underlineButton}>
               {navItem === "instructors" ? (
                 <strong className={classes.buttonSelected}>
-                  Instructores
+                  Instructors
                 </strong>
               ) : (
-                <span>Instructores</span>
+                <span>Instructors</span>
               )}
             </button>
             <button onClick={goStudents} className={classes.underlineButton}>
               {navItem === "students" ? (
                 <strong className={classes.buttonSelected}>
-                  Alumnos
+                  Students
                 </strong>
               ) : (
-                <span>Alumnos</span>
+                <span>Students</span>
               )}
             </button>
           </div>
@@ -91,11 +91,11 @@ function AuthNavBarS({ navItem }) {
           <Icon path={mdiMenu} size={1.5} className={classes.menuIcon} onClick={toggleDropdown} />
           {showDropdown && (
             <div className={classes.dropdownMenu}>
-              <button onClick={goClasses}>Clases</button>
-              <button onClick={goActivities}>Actividades</button>
-              <button onClick={goShifts}>Turnos</button>
-              <button onClick={goInstructors}>Instructores</button>
-              <button onClick={goStudents}>Alumnos</button>
+              <button onClick={goClasses}>Classes</button>
+              <button onClick={goActivities}>Activities</button>
+              <button onClick={goShifts}>Shifts</button>
+              <button onClick={goInstructors}>Instructors</button>
+              <button onClick={goStudents}>Students</button>
             </div>
           )}
         </>
