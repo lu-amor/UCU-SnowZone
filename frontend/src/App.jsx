@@ -37,6 +37,7 @@ function App() {
   const [instructorsArray, setInstructorsArray] = useState([]);
   const [reportsArray, setReportsArray] = useState([]);
   const [equipmentArray, setEquipmentArray] = useState([]);
+  const [inscriptionsArray, setInscriptionsArray] = useState([]);
 
   useEffect(() => {
     fetchStudents()
@@ -46,6 +47,7 @@ function App() {
     fetchInstructors()
     fetchEquipment()
     fetchReports()
+    fetchInscriptions()
   }, []);
 
   /* -------------------------- Funciones alumnos ------------------------------------*/
@@ -315,14 +317,58 @@ function App() {
     }
   }
 
-  const addClass = async (profesor, actividad, turno ) => {
+  const addClass = async (ci_instructor, id_actividad, id_turno, grupal ) => {
     const newClass = {
-      profesor: profesor,
-      actividad: actividad,
-      turno: turno
+      ci_instructor: ci_instructor,
+      id_actividad: id_actividad,
+      id_turno: id_turno,
+      grupal: grupal
     };
     const clase = await postClassAW(newClass);
     setClassesArray([...classesArray, clase]);
+  };
+
+  async function updateClassAW ( clase ) {
+    try {
+      await fetch(`http://127.0.0.1:5000/classes/${ clase.id }`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify( clase ),
+      });
+    } catch (error) {
+      console.error("Error updating data: ", error);
+    }
+  }
+
+  const updateClass = (clase) => {
+    updateClassAW( clase ).then(() => {
+      setClassesArray([
+      ...classesArray.map((currentClass) =>
+        currentClass.id === clase.id ? clase : currentClass
+      ),
+    ])});
+  };
+
+  async function deleteClassAW( clase ) {
+    try {
+      await fetch(`http://127.0.0.1:5000/classes/${ clase.id }`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+    } catch (error) {
+      console.error("Error deleting data: ", error);
+    }
+  }
+
+  const deleteClass = (clase) => {
+    deleteClassAW( clase ).then(() => {
+      setClassesArray([
+      ...classesArray.filter((currentClass) => currentClass.id !== clase.id),
+    ])});
   };
 
   /* -------------------------- Funciones instructores ------------------------------------*/
@@ -404,6 +450,95 @@ function App() {
       setInstructorsArray([
       ...instructorsArray.filter((currentInstructor) => currentInstructor.ci !== instructor.ci),
     ])});
+  };
+
+  /* ---------------------------Funciones incripciones ----------------------------------- */
+  const fetchInscriptions = async () => {
+    try {
+      const response = await fetch("http://127.0.0.1:5000/inscription");
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data = await response.json();
+      setInscriptionsArray(data.inscription);
+    }
+    catch (error) {
+      console.error("Error fetching inscriptions: ", error);
+    }
+  };
+
+  async function postInscriptionAW (inscripcion) {
+    try {
+      const response = await fetch("http://127.0.0.1:5000/inscription", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(inscripcion),
+      });
+      
+      const newInscription = await response.json();
+      return newInscription;
+    }
+    catch (error) {
+      console.error("Error posting inscription: ", error);
+    }
+  };
+
+  const addInscription = (id_clase, id_alumno, id_kit) => {
+    const newInscription = {
+      id_clase: id_clase,
+      id_alumno: id_alumno,
+      id_kit: id_kit,
+    };
+    const inscription = postInscriptionAW(newInscription);
+    setInscriptionsArray([...inscriptionsArray, inscription]);
+  };
+
+  async function updateInscriptionAW (inscription) {
+    try {
+      await fetch(`http://127.0.0.1:5000/inscription/${inscription.id_clase}/${inscription.id_alumno}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(inscription),
+      });
+    } catch (error) {
+      console.error("Error updating inscription: ", error);
+    }
+  };
+
+  const updateInscription = (inscription) => {
+    updateInscriptionAW(inscription).then(() => {
+      setInscriptionsArray([
+        ...inscriptionsArray.map((currentInscription) =>
+          currentInscription.id_clase === inscription.id_clase && currentInscription.id_alumno === inscription.id_alumno ? inscription : currentInscription
+        ),
+      ]);
+    });
+  };
+
+  async function deleteInscriptionAW (id_clase, id_alumno) {
+    try {
+      await fetch(`http://127.0.0.1:5000/inscription/${id_clase}/${id_alumno}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+    }
+    catch (error) {
+      console.error("Error deleting inscription: ", error);
+    }
+  };
+
+  const deleteInscription = (id_clase, id_alumno) => {
+    deleteInscriptionAW(id_clase, id_alumno).then(() => {
+      setInscriptionsArray([
+        ...inscriptionsArray.filter((inscription) => inscription.id_clase !== id_clase || inscription.id_alumno !== id_alumno),
+      ]);
+    });
   };
 
   /* -------------------------- Funciones equipamiento ------------------------------------*/
@@ -520,7 +655,7 @@ function App() {
         <Route path="/homeTeacher" element={<HomeTeacher />}></Route>
         <Route path="/homeStudent" element={<HomeStudent />}></Route>
 
-        <Route path="/classes" element={<ClassesPage classesArray={classesArray} activities={activitiesArray} instructors={instructorsArray} shifts={shiftsArray} students={studentsArray} addClass={addClass}/>}></Route>
+        <Route path="/classes" element={<ClassesPage classesArray={classesArray} activities={activitiesArray} instructors={instructorsArray} shifts={shiftsArray} studentsArray={studentsArray} addClass={addClass} updateClass={updateClass} deleteClass={deleteClass} inscriptionsArray={inscriptionsArray} addInscription={addInscription} updateInscription={updateInscription} deleteInscription={deleteInscription}/>}></Route>
         <Route path="/classesT" element={<ClassesPageTeacher classesArray={classesArray} instructors={instructorsArray} shifts={shiftsArray} students={studentsArray}/>}></Route>
         <Route path="/classesS" element={<ClassesPageStudents classesArray={classesArray}/>}></Route>
 

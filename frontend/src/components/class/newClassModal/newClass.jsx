@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-const NewClassModal = ({ instructors, activities, turnos, closeModal }) => {
+const NewClassModal = ({ instructors, activities, turnos, closeModal, addClass }) => {
     const [instructor, setInstructor] = useState('');
     const [turno, setTurno] = useState('');
     const [actividad, setActividad] = useState('');
@@ -9,8 +9,8 @@ const NewClassModal = ({ instructors, activities, turnos, closeModal }) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const newClass = { actividad, instructor, turno, dictada, grupal: grupal ? 1 : 0 };
-        await newClass(newClass);
+        const newClass = { instructor, actividad, turno, dictada, grupal: grupal ? 1 : 0 };
+        await addClass(newClass);
         closeModal();
     };
 
@@ -21,21 +21,21 @@ const NewClassModal = ({ instructors, activities, turnos, closeModal }) => {
                 <div className="box has-background-warning-light">
                     <p className="subtitle is-4 has-text-weight-bold">New class</p>
                     <form onSubmit={handleSubmit}>
-                        <div className="field is-grouped">
-                            <div className="field">
+                        <div className="field">
+                            <div className="field is-grouped">
                                 <label className="label">Instructor</label>
                                 <div className="control">
                                     <div className="select">
                                         <select value={instructor} onChange={(e) => setInstructor(e.target.value)}>
                                             <option value="" disabled>Select an instructor</option>
                                             {instructors.map((instructor) => (
-                                                <option key={instructor.id} value={instructor.id}>{instructor.name}</option>
+                                                <option key={instructor.ci} value={instructor.ci}>{instructor.nombre} {instructor.apellido}</option>
                                             ))}
                                         </select>
                                     </div>
                                 </div>
                             </div>
-                            <div className="field">
+                            <div className="field is-grouped">
                                 <label className="label">Actividad</label>
                                 <div className="control">
                                     <div className="select">
@@ -48,14 +48,14 @@ const NewClassModal = ({ instructors, activities, turnos, closeModal }) => {
                                     </div>
                                 </div>
                             </div>
-                            <div className="field">
+                            <div className="field is-grouped">
                                 <label className="label">Turno</label>
                                 <div className="control">
                                     <div className="select">
                                         <select value={turno} onChange={(e) => setTurno(e.target.value)}>
                                             <option value="" disabled>Seleccionar turno</option>
                                             {turnos.map((turno) => (
-                                                <option key={turno.id} value={turno.id}>{turno.from} - {turno.to}</option>
+                                                <option key={turno.id} value={turno.id}>{turno.hora_inicio} - {turno.hora_fin}</option>
                                             ))}
                                         </select>
                                     </div>

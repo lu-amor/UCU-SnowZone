@@ -10,21 +10,21 @@ function ClassCardStudents ({ clase }) {
                 </h4>
                 <div className={`${classes.dataContainer}`}>
                     <p className={`${classes.data}`} id={classes.activity}>
-                        {clase.activity}
+                        {clase.descripcion}
                     </p>
                     <div className={`${classes.time}`}>
                         <p className={`${classes.data}`} id={classes.from}>
-                            {clase.from}
+                            {clase.hora_inicio}
                         </p>
                         <p className={`${classes.data}`}>
                             -
                         </p>
                         <p className={`${classes.data}`} id={classes.to}>
-                            {clase.to}
+                            {clase.hora_fin}
                         </p>
                     </div>
                     <p className={`${classes.data}`} id={classes.instructor}>
-                        {clase.instructor}
+                        {clase.nombre} {clase.apellido}
                     </p>
                     <p className={`${classes.data}`} id={classes.grupal}>
                         {clase.grupal ? "Grupal" : "Individual"}

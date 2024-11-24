@@ -476,7 +476,7 @@ def add_clase():
     profesor = data.get("ci_instructor")
     actividad = data.get("id_actividad")
     turno = data.get("id_turno")
-    dictada = data.get("dictada")
+    dictada = 0
     grupal = data.get("grupal")
 
     try:
@@ -700,37 +700,34 @@ def delete_equipamiento(id):
         return jsonify({"error": str(e)}), 500
 
 # --------------------------------- <3Rutas de Inscripcion (alumno_clase) :) ---------------------------------
-@app.route("/inscripcion")
+@app.route("/inscription", methods=["GET"])
 def inscripcion():
-    connection = get_db_connection()
-    cursor = connection.cursor(dictionary=True)
-    cursor.execute("SELECT * FROM alumno_clase")
-    value = cursor.fetchall()
-    return jsonify({"inscripcion": value}), 201
-
-#GET INSCRIPCION
-@app.route("/get_inscripcion/<int:id_clase>/<int:id_alumno>", methods=["GET"])
-def get_inscripcion(id_clase, id_alumno):
     try:
         connection = get_db_connection()
         cursor = connection.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM alumno_clase WHERE id_clase = %s AND id_alumno = %s", (id_clase, id_alumno))
-        inscripcion = cursor.fetchone()
-        if inscripcion:
-            cursor.close()
-            connection.close()
-            return jsonify({"inscripcion": inscripcion}), 200
-        else:
-            cursor.close()
-            connection.close()
-            return jsonify({"error": "Inscripción no encontrada"}), 404
-    except Exception as e:
+        cursor.execute("""
+                    SELECT 
+                        id_clase, 
+                        id_alumno, 
+                        id_kit, 
+                        a.nombre, 
+                        a.apellido 
+                    FROM 
+                        obligatorio.alumno_clase ac
+                    JOIN 
+                        obligatorio.alumno a 
+                    ON 
+                        ac.id_alumno = a.ci;
+                """)
+        inscription = cursor.fetchall()
         cursor.close()
         connection.close()
-        return jsonify({"error": str(e)}), 500
+        return jsonify({"inscription": inscription})
+    except Exception as e:
+        return jsonify({"message": str(e)}), 400
 
 #ADD INSCRIPCION
-@app.route("/add_inscripcion", methods=["POST"])
+@app.route("/inscription", methods=["POST"])
 def add_inscripcion():
     data = request.json
     id_clase = data.get("id_clase")
@@ -797,9 +794,8 @@ def add_inscripcion():
         connection.close()
         return jsonify({"error": str(e)}), 500
 
-
 #DELETE INSCRIPCION
-@app.route("/delete_inscripcion/<int:id_clase>/<int:id_alumno>", methods=["DELETE"])
+@app.route("/inscription/<int:id_clase>/<int:id_alumno>", methods=["DELETE"])
 def delete_inscripcion(id_clase,id_alumno):
 
     try:
@@ -846,7 +842,7 @@ def delete_inscripcion(id_clase,id_alumno):
         return jsonify({"error": str(e)}), 500
 
 #UPDATE INSCRIPCION
-@app.route("/update_inscripcion/<int:id_clase>/<int:id_alumno>", methods=["PATCH"])
+@app.route("/inscription/<int:id_clase>/<int:id_alumno>", methods=["PATCH"])
 def update_inscripcion(id_clase, id_alumno):
     data = request.json
     fields = []

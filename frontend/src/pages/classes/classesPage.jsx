@@ -5,7 +5,7 @@ import AuthNavBar from "../../components/navBar/navBar";
 import EditClassModal from "../../components/class/editClassModal/editClass";
 import NewClassModal from "../../components/class/newClassModal/newClass";
 
-const classesPage = ({classesArray, instructors, shifts, activities, studentsArray, addClass, updateClass, deleteClass}) => {
+const classesPage = ({classesArray, instructors, shifts, activities, studentsArray, addClass, updateClass, deleteClass, inscriptionsArray, addInscription, updateInscription, deleteInscription}) => {
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [selectedClass, setSelectedClass] = useState(null);
     const [isNewModalOpen, setIsNewModalOpen] = useState(false);
@@ -44,6 +44,11 @@ const classesPage = ({classesArray, instructors, shifts, activities, studentsArr
                     instructors={instructors}
                     shifts={shifts}
                     studentsArray={studentsArray}
+                    inscriptionsArray={inscriptionsArray}
+                    addInscription={addInscription}
+                    updateInscription={updateInscription}
+                    deleteInscription={deleteInscription}
+                    deleteClass={deleteClass}
                 />
             )}
             {isNewModalOpen && (

@@ -2,10 +2,11 @@ import React, { useState, useEffect } from 'react';
 import Icon from '@mdi/react';
 import { mdiDelete } from '@mdi/js'
 
-const EditClassModal = ({ selectedClass, instructors, shifts, studentsArray, closeModal, updateClass, deleteClass }) => {
+const EditClassModal = ({ selectedClass, instructors, shifts, studentsArray, closeModal, updateClass, deleteClass, inscriptionsArray, addInscription, updateInscription, deleteInscription }) => {
     const [instructor, setInstructor] = useState('');
     const [shift, setShift] = useState('');
     const [students, setStudents] = useState([]);
+    const [inscriptos, setInscriptos] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [filteredStudents, setFilteredStudents] = useState([]);
     const [activeTab, setActiveTab] = useState('todos');
@@ -20,8 +21,8 @@ const EditClassModal = ({ selectedClass, instructors, shifts, studentsArray, clo
 
     useEffect(() => {
         const filtered = (studentsArray || []).filter(student => {
-            const studentName = student.name.toLowerCase();
-            const studentSurname = student.surname.toLowerCase();
+            const studentName = student.nombre.toLowerCase();
+            const studentSurname = student.apellido.toLowerCase();
             const lowerCaseSearchTerm = searchTerm.toLowerCase();
 
             return (
@@ -31,6 +32,15 @@ const EditClassModal = ({ selectedClass, instructors, shifts, studentsArray, clo
         });
         setFilteredStudents(filtered);
     }, [searchTerm, studentsArray]);
+    
+    useEffect(() => {
+        const inscriptos = inscriptionsArray.filter(inscription => inscription.id_clase === selectedClass.id);
+        const students = studentsArray.filter(student => 
+            !inscriptos.some(inscription => inscription.id_alumno === student.ci)
+        );
+        setStudents(students);
+        setInscriptos(inscriptos);
+    }, [inscriptionsArray, selectedClass]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -50,6 +60,11 @@ const EditClassModal = ({ selectedClass, instructors, shifts, studentsArray, clo
         setStudents(students.filter(s => s.id !== studentId));
     };
 
+    const handleDelete = () => {
+        deleteClass(selectedClass);
+        closeModal();
+    };
+
     return (
         <div className="modal is-active">
             <div className="modal-background" onClick={closeModal}></div>
@@ -65,9 +80,9 @@ const EditClassModal = ({ selectedClass, instructors, shifts, studentsArray, clo
                                 <div className="control">
                                     <div className="select">
                                         <select value={instructor} onChange={(e) => setInstructor(e.target.value)}>
-                                            <option value="" disabled>Select an instructor</option>
+                                            <option value="" disabled>{selectedClass ? `${selectedClass.nombre} ${selectedClass.apellido}` : 'Seleccione un instructor'}</option>
                                             {instructors.map((instructor) => (
-                                                <option key={instructor.id} value={instructor.id}>{instructor.name}</option>
+                                                <option key={instructor.ci} value={instructor.ci}>{instructor.nombre} {instructor.apellido}</option>
                                             ))}
                                         </select>
                                     </div>
@@ -78,13 +93,24 @@ const EditClassModal = ({ selectedClass, instructors, shifts, studentsArray, clo
                                 <div className="control">
                                     <div className="select">
                                         <select value={shift} onChange={(e) => setShift(e.target.value)}>
-                                            <option value="" disabled>Select a shift</option>
+                                            <option value="" disabled>{selectedClass ? `${selectedClass.hora_inicio} - ${selectedClass.hora_fin}`: 'Seleccione un turno'}</option>
                                             {shifts.map((shift) => (
                                                 <option key={shift.id} value={shift.id}>{shift.hora_inicio} - {shift.hora_fin}</option>
                                             ))}
                                         </select>
                                     </div>
                                 </div>
+                            </div>
+                            <div className="field">
+                                <button 
+                                    type="button" 
+                                    className={`button is-primary is-justify-self-flex-end mt-5`} 
+                                    onClick={() => {
+                                        handleDelete(selectedClass);
+                                        closeModal();
+                                    }}
+                                    > <Icon path={mdiDelete} size={1.5} color='#ffffff' />
+                                </button>
                             </div>
                         </div>
                         
@@ -104,7 +130,7 @@ const EditClassModal = ({ selectedClass, instructors, shifts, studentsArray, clo
                         <div className="tabs is-boxed is-right">
                             <ul>
                                 <li className={activeTab === 'todos' ? 'is-active' : ''} onClick={() => setActiveTab('todos')}>
-                                    <a>All</a>
+                                    <a>Unenrolled</a>
                                 </li>
                                 <li className={activeTab === 'inscriptos' ? 'is-active' : ''} onClick={() => setActiveTab('inscriptos')}>
                                     <a>Enrolled</a>
@@ -113,11 +139,11 @@ const EditClassModal = ({ selectedClass, instructors, shifts, studentsArray, clo
                         </div>
 
                         <div className="field">
-                            {activeTab === 'todos' && filteredStudents.length > 0 && (
+                            {activeTab === 'todos' && students.length > 0 && (
                                 <div className="box">
-                                    {filteredStudents.map((student) => (
-                                        <div key={student.id} className="field is-grouped is-grouped-multiline">
-                                            <p>{student}</p>
+                                    {students.map((student) => (
+                                        <div key={student.ci} className="field is-grouped is-grouped-multiline">
+                                            <p>{student.ci} - {student.nombre} {student.apellido}</p>
                                             <button
                                                 type="button"
                                                 className="button is-small is-primary"
@@ -133,9 +159,9 @@ const EditClassModal = ({ selectedClass, instructors, shifts, studentsArray, clo
 
                             {activeTab === 'inscriptos' && students.length > 0 && (
                                 <div className="box">
-                                    {students.map((student) => (
-                                        <div key={student.id} className="field is-grouped is-grouped-multiline">
-                                            <p>{student}</p>
+                                    {inscriptos.map((student) => (
+                                        <div key={student.id_alumno} className="field is-grouped is-grouped-multiline">
+                                            <p>{student.id_alumno} - {student.nombre} {student.apellido}</p>
                                             <button
                                                 type="button"
                                                 className="button is-small is-danger"
