@@ -330,7 +330,7 @@ function App() {
 
   async function updateClassAW ( clase ) {
     try {
-      await fetch(`http://127.0.0.1:5000/classes/${ clase.id }`, {
+      await fetch(`http://127.0.0.1:5000/classes/${clase.id}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",

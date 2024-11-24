@@ -504,9 +504,6 @@ def update_clase(id):
     if "ci_instructor" in data:
         fields.append("ci_instructor = %s")
         values.append(data["ci_instructor"])
-    if "id_actividad" in data:
-        fields.append("id_actividad = %s")
-        values.append(data["id_actividad"])
     if "id_turno" in data:
         fields.append("Id_turno = %s")
         values.append(data["id_turno"])
@@ -515,15 +512,14 @@ def update_clase(id):
         cursor.close()
         connection.close()
         return jsonify({"error": "No se proporcionaron campos para actualizar"}), 400
-
-    values.append(id)
     
     try:
-        query = f"UPDATE clase SET {', '.join(fields)} WHERE id = %s"
         connection = get_db_connection()
-        cursor = connection.cursor(dictionary=True)
-        cursor.execute(query, tuple(values))
+        cursor = connection.cursor()
+        cursor.execute("UPDATE clase SET " + ', '.join(fields) + " WHERE id = %s", values + [id],)
         connection.commit()
+        cursor.close()
+        connection.close()
         return jsonify({"message": "Clase actualizada correctamente"}), 200
     except Exception as e:
         connection.rollback()

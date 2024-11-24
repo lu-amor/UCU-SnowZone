@@ -1,16 +1,19 @@
 import React, { useState, useEffect } from 'react';
 
 const NewClassModal = ({ instructors, activities, turnos, closeModal, addClass }) => {
-    const [instructor, setInstructor] = useState('');
-    const [turno, setTurno] = useState('');
-    const [actividad, setActividad] = useState('');
+    const [ci_instructor, setInstructor] = useState('');
+    const [id_turno, setTurno] = useState('');
+    const [id_actividad, setActividad] = useState('');
     const [grupal, setGrupal] = useState(true);
-    const dictada = false;
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const newClass = { instructor, actividad, turno, dictada, grupal: grupal ? 1 : 0 };
-        await addClass(newClass);
+        if (grupal === true) {
+            setGrupal(1);
+        } else {
+            setGrupal(0);
+        }
+        await addClass(ci_instructor, id_actividad, id_turno, grupal);
         closeModal();
     };
 
@@ -26,7 +29,7 @@ const NewClassModal = ({ instructors, activities, turnos, closeModal, addClass }
                                 <label className="label">Instructor</label>
                                 <div className="control">
                                     <div className="select">
-                                        <select value={instructor} onChange={(e) => setInstructor(e.target.value)}>
+                                        <select value={ci_instructor} onChange={(e) => setInstructor(e.target.value)}>
                                             <option value="" disabled>Select an instructor</option>
                                             {instructors.map((instructor) => (
                                                 <option key={instructor.ci} value={instructor.ci}>{instructor.nombre} {instructor.apellido}</option>
@@ -39,7 +42,7 @@ const NewClassModal = ({ instructors, activities, turnos, closeModal, addClass }
                                 <label className="label">Actividad</label>
                                 <div className="control">
                                     <div className="select">
-                                        <select value={actividad} onChange={(e) => setActividad(e.target.value)}>
+                                        <select value={id_actividad} onChange={(e) => setActividad(e.target.value)}>
                                             <option value="" disabled>Seleccionar actividad</option>
                                             {activities.map((actividad) => (
                                                 <option key={actividad.id} value={actividad.id}>{actividad.descripcion}</option>
@@ -52,7 +55,7 @@ const NewClassModal = ({ instructors, activities, turnos, closeModal, addClass }
                                 <label className="label">Turno</label>
                                 <div className="control">
                                     <div className="select">
-                                        <select value={turno} onChange={(e) => setTurno(e.target.value)}>
+                                        <select value={id_turno} onChange={(e) => setTurno(e.target.value)}>
                                             <option value="" disabled>Seleccionar turno</option>
                                             {turnos.map((turno) => (
                                                 <option key={turno.id} value={turno.id}>{turno.hora_inicio} - {turno.hora_fin}</option>
