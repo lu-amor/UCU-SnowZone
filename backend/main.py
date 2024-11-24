@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, url_for, request, flash, jsonify
+from flask import Flask, render_template, redirect, url_for, request, flash, jsonify, session
 from flask_login import LoginManager, login_user, logout_user, login_required, UserMixin
 import datetime
 from flask_cors import CORS
@@ -27,20 +27,17 @@ def load_user(user_id):
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        username = request.form['username']
+        mail = request.form['mail']
         password = request.form['password']
         
-        # Verificación de credenciales
-        if username in users and users[username] == password:
-            user = User(username)
+        if mail in users and users[mail] == password:
+            user = User(mail)
             login_user(user)
             redirect(url_for('protected'))
             return jsonify({"message": "Login successful", "status": "success"})
         else:
             flash('Usuario o contraseña incorrectos. Inténtalo de nuevo.')
             return jsonify({"message": "Invalid username or password", "status": "error"}), 401
-
-    return render_template('login.html')
 
 @app.route('/logout')
 @login_required
@@ -52,6 +49,7 @@ def logout():
 @login_required
 def protected():
     return "Esta es un área protegida."
+
 #------------------------------------------ Rutas de Alumnos :) --------------------------------------------
 
 @app.route("/students", methods=["GET"])

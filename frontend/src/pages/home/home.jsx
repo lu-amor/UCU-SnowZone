@@ -4,7 +4,7 @@ import classes from "./home.module.css";
 
 const Home = () => {
     return (
-        <div>
+        <>
             <NavBar />
             <div className={classes.content}>
                 <h1 className={`${classes.title}`}>Inicio</h1>
@@ -18,7 +18,7 @@ const Home = () => {
                     Usa la barra de navegación para acceder a las diferentes secciones del sistema.
                 </p>
             </div>
-        </div>
+        </>
     );
 };
 

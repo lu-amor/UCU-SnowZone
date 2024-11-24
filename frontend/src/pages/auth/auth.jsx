@@ -1,21 +1,31 @@
-import React, {useState, useEffect} from "react";
-import classes from "./auth.module.css";
-import LoginForm from "../../components/loginForm/loginForm";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
+import classes from "./auth.module.css";
+
 const AuthPage = () => {
-    const [showLoginForm, setShowLoginForm] = useState(true);
+    const navigate = useNavigate();
 
-    const handleGoLoginModalBtn = () => {
-        setShowLoginForm(true);
-    };
+    const goAdmin = () => navigate("/home");
+    const goInstructor = () => navigate("/homeTeacher");
+    const goStudent = () => navigate("/homeStudent");
 
-    return (
-    <div>
-        {showLoginForm && <LoginForm />}
+return (
+    <div className={classes.auth}>
+        <img src="../../UCU SnowZone logo & texto.png" alt="UCU Logo" style={{width: '50%', alignSelf: "center", justifySelf: "center"}} />
+        <p className={classes.paragraph}>
+            Bienvenido al sistema de gestión de UCU SnowZone.
+        </p>
+        <p className={classes.paragraph}>
+            Seleccione su rol para ingresar al sistema.
+        </p>
+        <div className={classes.buttonsContainer}>
+            <button className="button is-success has-text-white" onClick={goAdmin}>Admin</button>
+            <button className="button is-success has-text-white" onClick={goInstructor}>Instructor</button>
+            <button className="button is-success has-text-white" onClick={goStudent}>Student</button>
+        </div>
     </div>
-    );
+);
 };
-
 
 export default AuthPage;

@@ -5,7 +5,6 @@ import { BrowserRouter as Router } from "react-router-dom";
 import 'bulma/css/bulma.css'
 import "./index.css";
 
-
 ReactDOM.createRoot(document.getElementById("root")).render(
   <Router>
     <React.StrictMode>

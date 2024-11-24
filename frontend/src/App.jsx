@@ -4,8 +4,6 @@ import Home from './pages/home/home'
 import HomeTeacher from './pages/home/homeTeacher'
 import HomeStudent from './pages/home/homeStudent'
 import AuthPage from './pages/auth/auth'
-import ForgotPasswordForm from './pages/auth/ForgotPasswordForm';
-import ResetPasswordForm from './pages/auth/ResetPasswordForm';
 
 import ClassesPage from './pages/classes/classesPage'
 import ClassesPageTeacher from './pages/classes/classesPageTeacher'
@@ -511,15 +509,12 @@ function App() {
     } catch (error) {
       console.error("Error fetching reports:", error);
     }
-  };
-  
+  };  
 
   return (
     <Routes>
       <Route path="/*" element={<Navigate replace to="/login" />} />
         <Route path="/login" element={<AuthPage />}></Route>
-        <Route path="/forgot-password" element={<ForgotPasswordForm />} />
-        <Route path="/reset-password" element={<ResetPasswordForm />} />
 
         <Route path="/home" element={<Home />}></Route>
         <Route path="/homeTeacher" element={<HomeTeacher />}></Route>

@@ -4,7 +4,7 @@ import classes from "./home.module.css";
 
 const HomeTeacher = () => {
     return (
-        <div>
+        <>
             <NavBarT />
             <div className={classes.content}>
                 <h1 className={`${classes.title}`}>Home</h1>
@@ -15,7 +15,7 @@ const HomeTeacher = () => {
                     Use the navigation bar to access the different sections of the system.
                 </p>
             </div>
-        </div>
+        </>
     );
 };
 

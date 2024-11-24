@@ -1,6 +1,7 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 /* eslint-disable no-unused-vars */
 import React, {useState} from "react";
+
 import classes from "./studentsPage.module.css";
 import StudentCard from "../../components/student/studentCard/studentCard";
 import AuthNavBar from "../../components/navBar/navBar";
@@ -18,12 +19,12 @@ const studentsPage = ({studentsArray, addStudent, updateStudent, deleteStudent})
         <>
             <AuthNavBar navItem="students" />
             <div className={`${classes.content}`}>
-                <h1 className={`${classes.header}`}>Students</h1>
+                <h1 className={`${classes.header}`}>Alumnos</h1>
                 <div className={`${classes.buttonContainer}`}>
                     <button
                         id="addStudentButton"
                         className={`button is-primary ${classes.addStudentButton}`}
-                        onClick={() => setIsNewModalOpen(true)}>add Student
+                        onClick={() => setIsNewModalOpen(true)}>Nuevo Alumno
                     </button>
                 </div>
                 <div className={`${classes.cardsContainer}`}>
