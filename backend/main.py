@@ -861,6 +861,7 @@ def add_inscripcion():
                 "UPDATE obligatorio.equipamiento_kit SET cant_disponibles = cant_disponibles - 1 WHERE id = %s",
                 (id_kit,)
             )
+        print(f"DEBUG: inscripcion: {id_clase}, {id_alumno}, {id_kit}, {costo_total}")
 
         # Insertar inscripción con el costo calculado
         cursor.execute(
@@ -870,7 +871,7 @@ def add_inscripcion():
         )
 
         connection.commit()
-        return jsonify({"message": "Inscripción realizada correctamente", "costo_total": costo_total}), 201
+        return jsonify({"message": "Inscripción realizada correctamente", "costo_total": costo_total})
 
     except Exception as e:
         if connection:
