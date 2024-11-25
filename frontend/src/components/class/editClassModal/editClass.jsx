@@ -2,11 +2,14 @@ import React, { useState, useEffect } from 'react';
 import Icon from '@mdi/react';
 import { mdiDelete } from '@mdi/js'
 
-const EditClassModal = ({ selectedClass, instructors, turnos, studentsArray, closeModal, updateClass, deleteClass, inscriptionsArray, addInscription, updateInscription, deleteInscription }) => {
+const EditClassModal = ({ selectedClass, equipmentArray, instructors, turnos, studentsArray, closeModal, updateClass, deleteClass, inscriptionsArray, addInscription, updateInscription, deleteInscription }) => {
     const [ci_instructor, setInstructor] = useState('');
     const [id_turno, setShift] = useState('');
     const [students, setStudents] = useState([]);
+    const [studentsClass, setStudentsClass] = useState([]);
     const [inscriptos, setInscriptos] = useState([]);
+    const [selectedKits, setSelectedKits] = useState({});
+    const [activityKit, setActivityKit] = useState([]);
     const [activeTab, setActiveTab] = useState('todos');
 
     useEffect(() => {
@@ -15,6 +18,8 @@ const EditClassModal = ({ selectedClass, instructors, turnos, studentsArray, clo
             setShift(selectedClass.id_turno);
             const turno = turnos.find(turno => turno.hora_inicio === selectedClass.hora_inicio && turno.hora_fin === selectedClass.hora_fin);
             setShift(turno ? turno.id : '');
+            const filteredEquipment = equipmentArray.filter(equipment => equipment.actividad === selectedClass.descripcion);
+            setActivityKit(filteredEquipment);
             setStudents(selectedClass.students);
         }
     }, [selectedClass]);
@@ -24,6 +29,10 @@ const EditClassModal = ({ selectedClass, instructors, turnos, studentsArray, clo
         const students = studentsArray.filter(student => 
             !inscriptos.some(inscription => inscription.id_alumno === student.ci)
         );
+        const studentsClass = studentsArray.filter(student => 
+            inscriptos.some(inscription => inscription.id_alumno === student.ci)
+        );
+        setStudentsClass(studentsClass);
         setStudents(students);
         setInscriptos(inscriptos);
     }, [inscriptionsArray, selectedClass]);
@@ -36,15 +45,38 @@ const EditClassModal = ({ selectedClass, instructors, turnos, studentsArray, clo
         closeModal();
     };
 
-    const addStudent = (student) => {
-        if (!students.some(s => s.id === student.id)) {
-            setStudents([...students, student]);
-        }
+    const handleKitChange = (studentId, kitId) => {
+        setSelectedKits((prev) => ({
+            ...prev,
+            [studentId]: kitId,
+        }));
+    };
+    
+    const addStudent = async (student) => {
+        const kitId = selectedKits[student.ci];
+        await addInscription(selectedClass.id, student.ci, kitId);
+        setInscriptos([...inscriptos, { ...student, id_equipment: kitId }]);
+        setStudents(students.filter((s) => s.ci !== student.ci));
     };
 
-    const removeStudent = (studentId) => {
-        console.log(studentId);
-        setStudents(students.filter(s => s.id !== studentId));
+    const removeInscription = async (student) => {
+        const id_alumno = student.ci;
+        const id_clase = selectedClass.id;
+
+        await deleteInscription( id_clase, id_alumno );
+
+        setInscriptos((prevInscriptos) =>
+            prevInscriptos.filter((inscription) => inscription.id_alumno !== id_alumno)
+        );
+
+        setStudentsClass((prevStudentsClass) =>
+            prevStudentsClass.filter((student) => student.ci !== id_alumno)
+        );
+
+        const removedStudent = studentsArray.find((student) => student.ci === id_alumno);
+        if (removedStudent) {
+            setStudents((prevStudents) => [...prevStudents, removedStudent]);
+        }
     };
 
     const handleDelete = () => {
@@ -118,29 +150,40 @@ const EditClassModal = ({ selectedClass, instructors, turnos, studentsArray, clo
                                     {students.map((student) => (
                                         <div key={student.ci} className="field is-grouped is-grouped-multiline">
                                             <p>{student.ci} - {student.nombre} {student.apellido}</p>
+                                            <select
+                                                style={{ marginLeft: 'auto' }}
+                                                onChange={(e) => handleKitChange(student.ci, e.target.value)}
+                                                value={selectedKits[student.ci] || "null"}
+                                            >
+                                                <option value="null">No kit</option>
+                                                {activityKit.map((equipment) => (
+                                                    <option key={equipment.id} value={equipment.id}>
+                                                        {equipment.tamanio}
+                                                    </option>
+                                                ))}
+                                            </select>
                                             <button
                                                 type="button"
                                                 className="button is-small is-primary"
                                                 onClick={() => addStudent(student)}
-                                                style={{marginLeft: 'auto'}}
+                                                style={{ marginLeft: '3px' }}
                                             >
                                                 Agregar
                                             </button>
                                         </div>
-                                    ))}
+                                    ))}                                    
                                 </div>
                             )}
-
-                            {activeTab === 'inscriptos' && students.length > 0 && (
+                            {activeTab === 'inscriptos' && studentsClass.length > 0 && (
                                 <div className="box">
-                                    {inscriptos.map((student) => (
-                                        <div key={student.id_alumno} className="field is-grouped is-grouped-multiline">
-                                            <p>{student.id_alumno} - {student.nombre} {student.apellido}</p>
+                                    {studentsClass.map((student) => (
+                                        <div key={student.ci} className="field is-grouped is-grouped-multiline">
+                                            <p>{student.ci} - {student.nombre} {student.apellido}</p>
                                             <button
                                                 type="button"
                                                 className="button is-small is-danger"
-                                                onClick={() => removeStudent(student.id)}
-                                                style={{marginLeft: 'auto'}}
+                                                onClick={() => removeInscription(student)}
+                                                style={{ marginLeft: 'auto' }}
                                             >
                                                 Unenroll
                                             </button>
