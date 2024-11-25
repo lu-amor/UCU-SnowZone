@@ -8,6 +8,8 @@ Aplicacion web para gestionar alumnos, reservas y actividades. Utilizando mysql,
 1. Clonar this repository:
    ```bash
    git clone https://github.com/lu-amor/UCU-SnowZone.git
+   git branch -a
+   git checkout lu
 
 ### Con Docker
 2. Desde la raíz del proyecto ejecutar
