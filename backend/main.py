@@ -4,6 +4,7 @@ import datetime
 from flask_cors import CORS
 from config import app, get_db_connection
 from datetime import timedelta
+import mysql.connector
 
 app = Flask(__name__)
 CORS(app, resources={r"/*": {
@@ -817,9 +818,17 @@ def add_inscripcion():
             raise Exception("Clase no encontrada")
         print(f"DEBUG: clase_info: {clase_info}")
 
-        # Verificar valor de 'grupal'
+        # Manejar inscripción dependiendo del tipo de clase
         if clase_info["grupal"] == 0:
-            raise Exception("No se pueden inscribir alumnos en clases no grupales")
+            # Verificar si la clase ya tiene un alumno inscrito
+            cursor.execute(
+                "SELECT COUNT(*) AS count FROM obligatorio.alumno_clase WHERE id_clase = %s",
+                (id_clase,)
+            )
+            count_info = cursor.fetchone()
+            if count_info["count"] > 0:
+                raise Exception("La clase individual ya tiene un alumno inscrito")
+            print(f"DEBUG: Clase {id_clase} es individual, permitiendo inscripción.")
         else:
             print(f"DEBUG: Clase {id_clase} es grupal, procediendo con inscripción.")
 
@@ -841,14 +850,21 @@ def add_inscripcion():
             raise Exception("El alumno ya está inscrito en otra clase en este turno")
 
         # Obtener costo de la clase/actividad
-        cursor.execute("SELECT costo FROM obligatorio.actividades WHERE id = %s", (id_clase,))
+        cursor.execute("SELECT id_actividad FROM obligatorio.clase WHERE id = %s", (id_clase,))
+        actividad_info = cursor.fetchone()
+        if not actividad_info:
+            raise Exception("Actividad no encontrada para la clase")
+
+        id_actividad = actividad_info["id_actividad"]
+
+        cursor.execute("SELECT costo FROM obligatorio.actividades WHERE id = %s", (id_actividad,))
         actividad = cursor.fetchone()
         if not actividad:
-            raise Exception("Clase no encontrada")
+            raise Exception("Costo no encontrado para la actividad")
         costo_total += actividad["costo"]
         print(f"DEBUG: Costo de la actividad: {actividad['costo']}")
 
-        # Si hay un kit, obtener su costo y restar disponibilidad
+        # Manejar kits si están presentes
         if id_kit:
             cursor.execute("SELECT costo FROM obligatorio.equipamiento_kit WHERE id = %s", (id_kit,))
             kit = cursor.fetchone()
@@ -873,10 +889,15 @@ def add_inscripcion():
         connection.commit()
         return jsonify({"message": "Inscripción realizada correctamente", "costo_total": costo_total})
 
+    except mysql.connector.Error as e:
+        # Manejo de errores en base de datos
+        error_message = str(e)
+        return jsonify({"error": "Error en la base de datos.", "detail": error_message}), 500
+
     except Exception as e:
         if connection:
             connection.rollback()
-        print(f"ERROR: {str(e)}")  # Log del error exacto
+        print(f"ERROR: {str(e)}")
         return jsonify({"error": str(e)}), 500
 
     finally:
