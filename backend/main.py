@@ -329,7 +329,6 @@ def update_clase(id_clase):
 
 
 #FUNCION HORARIO
-# FUNCION HORARIO
 def verificar_horario_clase(id_clase):
     try:
         connection = get_db_connection()
@@ -537,11 +536,28 @@ def add_inscripcion():
     id_kit = data.get("id_kit")
     costo_total = 0
 
+    connection = None
+    cursor = None
+
     try:
         connection = get_db_connection()
         cursor = connection.cursor(dictionary=True)
 
-        # Verificar si el alumno ya está inscrito en una clase del mismo turno
+        # Validar si la clase es grupal
+        cursor.execute("SELECT grupal FROM obligatorio.clase WHERE id = %s", (id_clase,))
+        clase_info = cursor.fetchone()
+        if not clase_info:
+            raise Exception("Clase no encontrada")
+        print(f"DEBUG: clase_info: {clase_info}")
+
+        # Verificar valor de 'grupal'
+        if clase_info["grupal"] == 0:
+            cursor.execute("SELECT id_clase FROM obligatorio.alumno_clase WHERE id_clase = %s", (id_clase,))
+            check_individual = cursor.fetchone()
+            if check_individual:
+                raise Exception("No hay cupos disponibles")
+
+        # Verificar si el alumno ya está inscrito en otra clase del mismo turno
         cursor.execute(
             """
             SELECT c.id_turno 
@@ -554,6 +570,7 @@ def add_inscripcion():
             (id_alumno, id_clase)
         )
         existing_inscription = cursor.fetchone()
+        print(f"DEBUG: existing_inscription: {existing_inscription}")
         if existing_inscription:
             raise Exception("El alumno ya está inscrito en otra clase en este turno")
 
@@ -563,6 +580,7 @@ def add_inscripcion():
         if not actividad:
             raise Exception("Clase no encontrada")
         costo_total += actividad["costo"]
+        print(f"DEBUG: Costo de la actividad: {actividad['costo']}")
 
         # Si hay un kit, obtener su costo y restar disponibilidad
         if id_kit:
@@ -571,6 +589,7 @@ def add_inscripcion():
             if not kit:
                 raise Exception("Kit no encontrado")
             costo_total += kit["costo"]
+            print(f"DEBUG: Costo del kit: {kit['costo']}")
 
             cursor.execute(
                 "UPDATE obligatorio.equipamiento_kit SET cant_disponibles = cant_disponibles - 1 WHERE id = %s",
@@ -585,16 +604,19 @@ def add_inscripcion():
         )
 
         connection.commit()
-        cursor.close()
-        connection.close()
         return jsonify({"message": "Inscripción realizada correctamente", "costo_total": costo_total}), 201
 
     except Exception as e:
         if connection:
             connection.rollback()
-        cursor.close()
-        connection.close()
+        print(f"ERROR: {str(e)}")  
         return jsonify({"error": str(e)}), 500
+
+    finally:
+        if cursor:
+            cursor.close()
+        if connection:
+            connection.close()
 
 
 #DELETE INSCRIPCION
@@ -655,6 +677,36 @@ def update_inscripcion(id_clase, id_alumno):
         connection = get_db_connection()
         cursor = connection.cursor(dictionary=True)
 
+        # Verificar si la clase es grupal
+        cursor.execute("SELECT grupal FROM clase WHERE id = %s", (id_clase,))
+        clase = cursor.fetchone()
+
+        if clase and not clase["grupal"]:
+            # Verificar si ya hay un alumno inscrito en la clase no grupal
+            cursor.execute("SELECT COUNT(*) as count FROM alumno_clase WHERE id_clase = %s", (id_clase,))
+            inscripciones = cursor.fetchone()
+
+            if inscripciones["count"] > 0:
+                cursor.close()
+                connection.close()
+                return jsonify({"error": "No se puede inscribir a más de un alumno en una clase no grupal"}), 400
+
+        # Verificar si el alumno ya está inscrito en una clase del mismo turno
+        cursor.execute(
+            """
+            SELECT c.id_turno 
+            FROM obligatorio.alumno_clase ac
+            JOIN obligatorio.clase c ON ac.id_clase = c.id
+            WHERE ac.id_alumno = %s AND c.id_turno = (
+                SELECT id_turno FROM obligatorio.clase WHERE id = %s
+            )
+            """, 
+            (id_alumno, id_clase)
+        )
+        existing_inscription = cursor.fetchone()
+        if existing_inscription:
+            raise Exception("El alumno ya está inscrito en otra clase en este turno")
+
         if 'id_kit' in data:
             fields.append('id_kit = %s')
             values.append(data['id_kit'])
@@ -678,7 +730,6 @@ def update_inscripcion(id_clase, id_alumno):
         # Consistencia e integridad de datos (id_clase y id_alumno no se modifcian)
         id_clase_actual = inscripcion['id_clase']
         id_kit_actual = data.get('id_kit', inscripcion['id_kit'])
-
 
         # Obtener el costo de la clase asociada al id_clase_actual
         cursor.execute("SELECT id_actividad FROM obligatorio.clase WHERE id = %s", (id_clase_actual,))
