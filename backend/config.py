@@ -7,8 +7,9 @@ CORS(app)
 
 def get_db_connection():
     return mysql.connector.connect(
-        host="localhost",
-        user="root",
-        password="rootpassword",
-        database="obligatorio"
+        host="db",
+        user="admin",
+        password="adminpassword",
+        database="obligatorio",
+        port=3306
     )

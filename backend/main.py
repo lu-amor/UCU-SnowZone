@@ -6,7 +6,7 @@ from config import app, get_db_connection
 
 app = Flask(__name__)
 CORS(app, resources={r"/*": {
-    "origins": "http://localhost:5173",
+    "origins": "http://127.0.0.1:5173",
     "methods": ["GET", "POST", "PATCH", "DELETE"]
 }})
 
@@ -920,5 +920,8 @@ def update_inscripcion(id_clase, id_alumno):
         if connection:
             connection.close()
 
+@app.route("/")
+def home():
+    return "Hello, Flask is running!"
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, host="0.0.0.0", port=5000)
