@@ -12,7 +12,7 @@ const AuthPage = () => {
 
 return (
     <div className={classes.auth}>
-        <img src="../../UCU SnowZone logo & texto.png" alt="UCU Logo" style={{width: '50%', alignSelf: "center", justifySelf: "center"}} />
+        <img src="../../UCU SnowZone logo & texto.png" alt="UCU Logo" style={{width: 200, alignSelf: "center", justifySelf: "center"}} />
         <p className={classes.paragraph}>
             Bienvenido al sistema de gestión de UCU SnowZone.
         </p>

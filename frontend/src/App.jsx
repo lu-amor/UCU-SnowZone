@@ -656,7 +656,7 @@ function App() {
         <Route path="/homeStudent" element={<HomeStudent />}></Route>
 
         <Route path="/classes" element={<ClassesPage classesArray={classesArray} equipmentArray={equipmentArray} activities={activitiesArray} instructors={instructorsArray} shifts={shiftsArray} studentsArray={studentsArray} addClass={addClass} updateClass={updateClass} deleteClass={deleteClass} inscriptionsArray={inscriptionsArray} addInscription={addInscription} updateInscription={updateInscription} deleteInscription={deleteInscription}/>}></Route>
-        <Route path="/classesT" element={<ClassesPageTeacher classesArray={classesArray} instructors={instructorsArray} shifts={shiftsArray} students={studentsArray}/>}></Route>
+        <Route path="/classesT" element={<ClassesPageTeacher classesArray={classesArray} instructors={instructorsArray} shifts={shiftsArray} students={studentsArray} updateClass={updateClass}/>}></Route>
         <Route path="/classesS" element={<ClassesPageStudents classesArray={classesArray}/>}></Route>
 
         <Route path="/activities" element={<ActivitiesPage activitiesArray={activitiesArray} addActivity={addActivity} updateActivity={updateActivity} deleteActivity={deleteActivity}/>}></Route>

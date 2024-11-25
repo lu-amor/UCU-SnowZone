@@ -1,16 +1,30 @@
 import React, { useState } from "react";
 import classes from "./classCard.module.css";
 import Icon from '@mdi/react';
-import { mdiCheckCircle } from '@mdi/js'
-import { mdiRadioboxBlank } from '@mdi/js';
+import { mdiCheckCircle, mdiRadioboxBlank } from '@mdi/js';
 
-function ClassCard({ openEditModal, clase }) {
+function ClassCardTeacher({ openEditModal, clase, updateClass }) {
     const [dictada, setDictada] = useState(clase.dictada);
 
-    const handleDictadaBtn = () => {
-        clase.dictada = !clase.dictada;
-        setDictada(clase.dictada);
-        updateClass(clase);
+    const handleDictadaBtn = async (e) => {
+        e.preventDefault();
+
+        // Alternar el estado de `dictada`
+        const newDictada = !dictada;
+        setDictada(newDictada);
+
+        // Crear un objeto con los datos actualizados
+        const updatedClass = { ...clase, dictada: newDictada };
+
+        try {
+            // Realizar la actualización en el servidor
+            await updateClass(updatedClass);
+            console.log("Clase actualizada exitosamente:", updatedClass);
+        } catch (error) {
+            console.error("Error actualizando la clase:", error);
+            // Revertir el cambio en caso de error
+            setDictada(clase.dictada);
+        }
     };
 
     return (
@@ -39,8 +53,18 @@ function ClassCard({ openEditModal, clase }) {
                     </p>
                 </div>
             </div>
+            <button
+                onClick={handleDictadaBtn}
+                className={`${classes.buttonDictada}`}
+            >
+                {dictada ? (
+                    <Icon path={mdiCheckCircle} size={1} color="white" />
+                ) : (
+                    <Icon path={mdiRadioboxBlank} size={1} color="white" />
+                )}
+            </button>
         </div>
     );
 }
 
-export default ClassCard;
+export default ClassCardTeacher;
