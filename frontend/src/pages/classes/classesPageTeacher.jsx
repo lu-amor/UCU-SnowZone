@@ -1,8 +1,7 @@
 import React, {useState} from "react";
 import classes from "./classesPage.module.css";
-import ClassCard from "../../components/class/classCard/classCard";
+import ClassCardTeacher from "../../components/class/classCard/classCardTeacher";
 import AuthNavBarT from "../../components/navBar/navBarT";
-import EditClassTeacherModal from "../../components/class/editClassModal/editClassTeacher";
 
 const classesPageTeacher = ({classesArray, instructors, shifts, studentsArray, updateClass}) => {
     const [classList, setClassList] = useState([]);
@@ -17,29 +16,18 @@ const classesPageTeacher = ({classesArray, instructors, shifts, studentsArray, u
                 <div className={`${classes.cardsContainer}`}>
                     {classesArray.map((clase) => {
                         return (
-                            <ClassCard
+                            <ClassCardTeacher
                             key={clase.id}
                             clase={clase}
                             updateClass={updateClass}
                             openEditModal={() => {
                                 setSelectedClass(clase);
-                                setIsEditModalOpen(true);
                             }}
                             />
                         );
                     })}
                 </div>
             </div>
-            {isEditModalOpen && (
-                <EditClassTeacherModal
-                    closeModal={() => setIsEditModalOpen(false)}
-                    updateClass={updateClass}
-                    selectedClass={selectedClass}
-                    instructors={instructors}
-                    shifts={shifts}
-                    studentsArray={studentsArray}
-                />
-            )}
         </>
     );
 };

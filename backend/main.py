@@ -3,6 +3,7 @@ from flask_login import LoginManager, login_user, logout_user, login_required, U
 import datetime
 from flask_cors import CORS
 from config import app, get_db_connection
+from datetime import timedelta
 
 app = Flask(__name__)
 CORS(app, resources={r"/*": {
@@ -50,7 +51,7 @@ def logout():
 def protected():
     return "Esta es un área protegida."
 
-#------------------------------------------ Rutas de Alumnos :) --------------------------------------------
+#------------------------------------------ Rutas de Alumnos : --------------------------------------------
 
 @app.route("/students", methods=["GET"])
 def get_students():
@@ -146,7 +147,7 @@ def delete_student(id):
         connection.close()
         return jsonify({"error": str(e)}), 500
 
-# ----------------------------------------- Rutas de Instructores :) --------------------------------------------
+# ----------------------------------------- Rutas de Instructores : --------------------------------------------
 
 @app.route("/instructors", methods=["GET"])
 def get_instructors():
@@ -241,7 +242,7 @@ def delete_instructor(id):
         cursor.close()
         connection.close()
         return jsonify({"error": str(e)}), 500
-# ----------------------------------------- Rutas de Turnos :) --------------------------------------------
+# ----------------------------------------- Rutas de Turnos :--------------------------------------------
 
 @app.route("/shifts", methods=["GET"])
 def get_shifts():
@@ -253,6 +254,7 @@ def get_shifts():
         for shift in shifts:
             for key in ["hora_inicio", "hora_fin"]:
                 if isinstance(shift[key], datetime.timedelta):
+                    total_seconds = shift[key].total_seconds()
                     total_seconds = shift[key].total_seconds()
                     hours = int(total_seconds // 3600)
                     minutes = int((total_seconds % 3600) // 60)
@@ -340,7 +342,7 @@ def delete_shift(id):
         connection.close()
         return jsonify({"error": str(e)}), 500
 
-# ---------------------------------------- Rutas de Actividades :) --------------------------------------------
+# ---------------------------------------- Rutas de Actividades :)--------------------------------------------
 
 @app.route("/activities", methods=["GET"])
 def get_activities():
@@ -428,7 +430,7 @@ def api_delete_actividad(id):
         connection.close()
         return jsonify({"error": str(e)}), 500
 
-#----------------------------------------- <3 Rutas de Clases :) ---------------------------------------------------
+#----------------------------------------- <3 Rutas de Clases :)---------------------------------------------------
 
 @app.route("/classes", methods =["GET"])
 def clases():
@@ -457,43 +459,28 @@ def clases():
 @app.route("/classes/<int:id>", methods=["DELETE"])
 def delete_clase(id):
     try:
+        # Verificar si la clase está en su horario
+        if verificar_horario_clase(id):
+            return jsonify({"error": "No se puede eliminar la clase durante su horario"}), 403
+        
         connection = get_db_connection()
         cursor = connection.cursor(dictionary=True)
-        cursor.execute("DELETE FROM clase WHERE id = %s", (id,))
+
+        # Eliminar la clase de la base de datos
+        cursor.execute("DELETE FROM obligatorio.clase WHERE id = %s", (id,))
         connection.commit()
+
         cursor.close()
         connection.close()
+
         return jsonify({"message": "Clase eliminada correctamente"}), 200
+    
     except Exception as e:
         connection.rollback()
         cursor.close()
         connection.close()
         return jsonify({"error": str(e)}), 500
-
-@app.route("/classes", methods=["POST"])
-def add_clase():
-    data = request.json
-    profesor = data.get("ci_instructor")
-    actividad = data.get("id_actividad")
-    turno = data.get("id_turno")
-    dictada = 0
-    grupal = data.get("grupal")
-
-    try:
-        connection = get_db_connection()
-        cursor = connection.cursor(dictionary=True)
-        cursor.execute("INSERT INTO clase (ci_instructor, id_actividad, id_turno, dictada, grupal) VALUES ( %s, %s, %s, %s, %s)",
-            ( profesor, actividad, turno, dictada, grupal))
-        connection.commit()
-        cursor.close()
-        connection.close()
-        return jsonify({"message": "Clase agregada correctamente"}), 201
-    except Exception as e:
-        connection.rollback()
-        cursor.close()
-        connection.close()
-        return jsonify({"error": str(e)}), 500
-
+    
 @app.route("/classes/<int:id>", methods=["PATCH"])
 def update_clase(id):
     data = request.json
@@ -507,10 +494,11 @@ def update_clase(id):
     if "id_turno" in data:
         fields.append("Id_turno = %s")
         values.append(data["id_turno"])
+    if "dictada" in data:
+        fields.append("dictada = %s")
+        values.append(1 if data["dictada"] else 0)
 
     if not fields:
-        cursor.close()
-        connection.close()
         return jsonify({"error": "No se proporcionaron campos para actualizar"}), 400
     
     try:
@@ -527,7 +515,91 @@ def update_clase(id):
         connection.close()
         return jsonify({"error": str(e)}), 500
 
-#-------------------------------------------- <3 Rutas de Reportes :) ---------------------------------
+#FUNCION HORARIO
+def verificar_horario_clase(id_clase):
+    try:
+        connection = get_db_connection()
+        with connection.cursor(dictionary=True) as cursor:
+            cursor.execute("SELECT id_turno FROM obligatorio.clase WHERE id = %s", (id_clase,))
+            clase = cursor.fetchone()
+
+            if clase:
+                id_turno = clase["id_turno"]
+                
+                # Obtener el turno de la clase
+                cursor.execute("SELECT hora_inicio, hora_fin FROM obligatorio.turno WHERE id = %s", (id_turno,))
+                turno = cursor.fetchone()
+
+                if turno:
+                    hora_inicio = turno["hora_inicio"]
+                    hora_fin = turno["hora_fin"]
+
+                    # Asegurarse de que las horas son de tipo time
+                    if isinstance(hora_inicio, timedelta):
+                        hora_inicio = (datetime(1, 1, 1) + hora_inicio).time()
+                    if isinstance(hora_fin, timedelta):
+                        hora_fin = (datetime(1, 1, 1) + hora_fin).time()
+
+                    hora_actual = datetime.now().time()  # hora actual (solo hora, no fecha)
+
+                    print(f"Hora inicio: {hora_inicio}, Hora fin: {hora_fin}, Hora actual: {hora_actual}")
+
+                    # Compara la hora actual con el rango de la clase
+                    if hora_inicio <= hora_actual <= hora_fin:
+                        print(f"La clase está en su horario: {hora_inicio} <= {hora_actual} <= {hora_fin}")
+                        return False  # durante el horario, no se puede modificar
+                    else:
+                        print(f"La clase NO está en su horario: {hora_inicio} <= {hora_actual} <= {hora_fin}")
+                        return True  # se puede modificar
+
+        return False
+    except Exception as e:
+        print(f"Error en verificar_horario_clase: {str(e)}")
+        return False
+    finally:
+        if connection:
+            connection.close()
+
+@app.route("/classes", methods=["POST"])
+def add_clase():
+    data = request.json
+    profesor = data.get("ci_instructor")
+    actividad = data.get("id_actividad")
+    turno = data.get("id_turno")
+
+    try:
+        connection = get_db_connection()
+        cursor = connection.cursor(dictionary=True, buffered=True)
+
+        # Verificar si el instructor ya tiene una clase en el mismo turno
+        cursor.execute(
+            "SELECT * FROM clase WHERE ci_instructor = %s AND id_turno = %s",
+            (profesor, turno)
+        )
+        existing_class = cursor.fetchone()
+
+        if existing_class:
+            cursor.close()
+            connection.close()
+            return jsonify({"error": "El instructor ya tiene una clase asignada en este turno"}), 400
+
+        cursor.execute(
+            "INSERT INTO clase (ci_instructor, id_actividad, id_turno) VALUES (%s, %s, %s)",
+            (profesor, actividad, turno)
+        )
+        connection.commit()
+
+        cursor.close()
+        connection.close()
+        return jsonify({"message": "Clase agregada correctamente"}), 201
+    except Exception as e:
+        connection.rollback()
+        if 'cursor' in locals() and cursor:
+            cursor.close()
+        connection.close()
+        return jsonify({"error": str(e)}), 500
+
+#-------------------------------------------- <3 Rutas de Reportes : ---------------------------------
 @app.route("/reports/incomePerActivity", methods=["GET"])
 def get_report1():
     try:
@@ -602,7 +674,7 @@ def get_report3():
             jsonify({"message": str(e)}), 400
         )
 
-# --------------------------------- <3Rutas de Equipamiento :) ---------------------------------
+# --------------------------------- <3Rutas de Equipamiento :---------------------------------
 
 @app.route("/equipamiento", methods=["GET"])
 def get_equipment():
@@ -695,7 +767,7 @@ def delete_equipamiento(id):
         connection.close()
         return jsonify({"error": str(e)}), 500
 
-# --------------------------------- <3Rutas de Inscripcion (alumno_clase) :) ---------------------------------
+# --------------------------------- <3Rutas de Inscripcion (alumno_clase) ---------------------------------
 @app.route("/inscription", methods=["GET"])
 def inscripcion():
     try:
@@ -731,11 +803,27 @@ def add_inscripcion():
     id_kit = data.get("id_kit")
     costo_total = 0
 
+    connection = None
+    cursor = None
+
     try:
         connection = get_db_connection()
         cursor = connection.cursor(dictionary=True)
 
-        # Verificar si el alumno ya está inscrito en una clase del mismo turno
+        # Validar si la clase es grupal
+        cursor.execute("SELECT grupal FROM obligatorio.clase WHERE id = %s", (id_clase,))
+        clase_info = cursor.fetchone()
+        if not clase_info:
+            raise Exception("Clase no encontrada")
+        print(f"DEBUG: clase_info: {clase_info}")
+
+        # Verificar valor de 'grupal'
+        if clase_info["grupal"] == 0:
+            raise Exception("No se pueden inscribir alumnos en clases no grupales")
+        else:
+            print(f"DEBUG: Clase {id_clase} es grupal, procediendo con inscripción.")
+
+        # Verificar si el alumno ya está inscrito en otra clase del mismo turno
         cursor.execute(
             """
             SELECT c.id_turno 
@@ -748,6 +836,7 @@ def add_inscripcion():
             (id_alumno, id_clase)
         )
         existing_inscription = cursor.fetchone()
+        print(f"DEBUG: existing_inscription: {existing_inscription}")
         if existing_inscription:
             raise Exception("El alumno ya está inscrito en otra clase en este turno")
 
@@ -757,6 +846,7 @@ def add_inscripcion():
         if not actividad:
             raise Exception("Clase no encontrada")
         costo_total += actividad["costo"]
+        print(f"DEBUG: Costo de la actividad: {actividad['costo']}")
 
         # Si hay un kit, obtener su costo y restar disponibilidad
         if id_kit:
@@ -765,6 +855,7 @@ def add_inscripcion():
             if not kit:
                 raise Exception("Kit no encontrado")
             costo_total += kit["costo"]
+            print(f"DEBUG: Costo del kit: {kit['costo']}")
 
             cursor.execute(
                 "UPDATE obligatorio.equipamiento_kit SET cant_disponibles = cant_disponibles - 1 WHERE id = %s",
@@ -779,16 +870,19 @@ def add_inscripcion():
         )
 
         connection.commit()
-        cursor.close()
-        connection.close()
         return jsonify({"message": "Inscripción realizada correctamente", "costo_total": costo_total}), 201
 
     except Exception as e:
         if connection:
             connection.rollback()
-        cursor.close()
-        connection.close()
+        print(f"ERROR: {str(e)}")  # Log del error exacto
         return jsonify({"error": str(e)}), 500
+
+    finally:
+        if cursor:
+            cursor.close()
+        if connection:
+            connection.close()
 
 #DELETE INSCRIPCION
 @app.route("/inscription/<int:id_clase>/<int:id_alumno>", methods=["DELETE"])
