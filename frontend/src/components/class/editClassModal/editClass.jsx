@@ -101,7 +101,7 @@ const EditClassModal = ({ selectedClass, equipmentArray, instructors, turnos, st
                                         <select value={ci_instructor} onChange={(e) => setInstructor(e.target.value)}>
                                             <option value="" disabled>{selectedClass ? `${selectedClass.nombre} ${selectedClass.apellido}` : 'Seleccione un instructor'}</option>
                                             {instructors.map((instructor) => (
-                                                <option key={instructor.ci} value={instructor.ci}>{instructor.nombre} {instructor.apellido}</option>
+                                                <option key={instructor.ci} value={instructor.ci}>{instructor.name}</option>
                                             ))}
                                         </select>
                                     </div>

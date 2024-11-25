@@ -17,6 +17,7 @@ Aplicacion web para gestionar alumnos, reservas y actividades. Utilizando mysql,
 2. Navegar al directorio:
    ```bash
    cd .\frontend\
+   cd .\frontend\
 
 3. Instalar dependencias de frontend
    ```bash
