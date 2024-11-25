@@ -196,7 +196,7 @@ SELECT
 FROM
     obligatorio.alumno;
 
-use obligatorio;
+/* use obligatorio;
 CREATE TRIGGER verificar_edad_al_inscribirse
 BEFORE INSERT ON alumno_clase
 FOR EACH ROW
@@ -216,8 +216,47 @@ BEGIN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'El alumno no cumple con la edad mínima para esta actividad';
     END IF;
-END;
+END; */
 
+DELIMITER $$
+
+CREATE TRIGGER verificar_edad_al_inscribirse
+BEFORE INSERT ON alumno_clase
+FOR EACH ROW
+BEGIN
+    DECLARE edad_alumno INT;
+    DECLARE min_edad INT;
+
+    -- Get age of the student
+    SELECT TIMESTAMPDIFF(YEAR, f_nac, CURDATE()) INTO edad_alumno
+    FROM alumno
+    WHERE ci = NEW.id_alumno;
+
+    -- Ensure we have a valid student and that edad_alumno is set
+    IF edad_alumno IS NULL THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'No se encontró el alumno con el id proporcionado';
+    END IF;
+
+    -- Get the minimum age for the activity
+    SELECT min_edad INTO min_edad
+    FROM actividades
+    WHERE id = (SELECT id_actividad FROM clase WHERE id = NEW.id_clase);
+
+    -- Ensure we have a valid minimum age and that min_edad is set
+    IF min_edad IS NULL THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'No se encontró la actividad correspondiente para la clase';
+    END IF;
+
+    -- Validate the student's age
+    IF edad_alumno < min_edad THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'El alumno no cumple con la edad mínima para esta actividad';
+    END IF;
+END$$
+
+DELIMITER ;
 
 CREATE TABLE obligatorio.clase_dictada (
     id_clase INT NOT NULL ,

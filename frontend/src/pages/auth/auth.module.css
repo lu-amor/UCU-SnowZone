@@ -1,0 +1,27 @@
+.auth {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    align-self: center;
+    align-content: center;
+}
+
+.paragraph {
+    font-size: 1rem;
+    margin-bottom: 1rem;
+    color: #173363;
+    max-width: 60%;
+    text-align: center;
+}
+
+.buttonsContainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    align-self: center;
+    align-content: center;
+    margin-top: 1rem;
+    gap: 0.7rem;
+}
