@@ -2,6 +2,8 @@
 
 Aplicacion web para gestionar alumnos, reservas y actividades. Utilizando mysql, flask y react.
 
+## Sin docker
+
 ## Instalacion
 1. Clonar this repository:
    ```bash
@@ -12,7 +14,10 @@ Aplicacion web para gestionar alumnos, reservas y actividades. Utilizando mysql,
    ```bash
    docker-compose up --build
 
-### Desde la linea de comandos
+### Sin docker
+   ```bash
+   git branch -a
+   git checkout lu
 
 2. Navegar al directorio:
    ```bash
@@ -45,4 +50,3 @@ Aplicacion web para gestionar alumnos, reservas y actividades. Utilizando mysql,
 8. Ejecutar el proyecto
    ```bash
    python3 main.py
-   
